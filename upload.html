@@ -160,26 +160,19 @@
       }, 2500);
     });
 
-   async function ladujDodaneDzis() {
+ async function ladujDodaneDzis() {
   try {
     const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-    const json = await res.json();
-
-    // Zabezpieczenie – dane są w json[0].response.body
-    const dane = json[0]?.response?.body || [];
-
+    const dane = await res.json();
     const kontener = document.getElementById("dodane-dzis");
     kontener.innerHTML = "";
 
     if (!Array.isArray(dane) || dane.length === 0) {
-      kontener.textContent = "Brak ogłoszeń do wyświetlenia.";
+      kontener.textContent = "Brak ogłoszeń na dziś.";
       return;
     }
 
     dane.forEach((item, i) => {
-      const tytul = item["Produkty Nowe"]?.trim() || "Brak tytułu";
-      const data = item["Data"]?.trim() || "Brak daty";
-
       const div = document.createElement("div");
       div.style.marginBottom = "1.5rem";
       div.style.padding = "1rem";
@@ -187,11 +180,10 @@
       div.style.borderRadius = "8px";
       div.style.backgroundColor = "#fff";
 
-      div.innerHTML = `
-        <strong>${i + 1}. ${tytul}</strong><br />
-        <em>Data: ${data}</em>
-      `;
+      const tytul = item.tytul?.trim() || "Brak tytułu";
+      const data = item.data?.trim() || "Brak treści";
 
+      div.innerHTML = `<strong>${i + 1}. ${tytul}</strong><br />${data}`;
       kontener.appendChild(div);
     });
   } catch (err) {
@@ -199,7 +191,6 @@
     document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
   }
 }
-
 
     document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
   </script>
