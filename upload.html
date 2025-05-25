@@ -202,7 +202,15 @@
       document.getElementById('loadingSpinner').style.display = 'inline-block';
 
       setTimeout(() => {
-        window.location.href = 'https://docs.google.com/spreadsheets/d/1aBDY9ZiFpua2cxhFCpG2u_n9tXQcVbd8bMrEQaSCSQU/edit#gid=0';
+        fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
+  method: 'POST',
+  body: new FormData(this)
+})
+.then(r => r.json())
+.then(data => {
+  const params = new URLSearchParams(data).toString();
+  window.location.href = `ogloszenie.html?${params}`;
+});
       }, 2500);
     });
   </script>
