@@ -74,11 +74,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const val = params.get(key);
     if (val) {
       const el = document.getElementById(mapping[key]);
-      if (el) el.value = decodeURIComponent(val);
+      if (el) el.value = val;
     }
   }
 });
-/* inicjalizacja */
 </script>
 </body>
 </html>
