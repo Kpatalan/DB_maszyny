@@ -26,7 +26,7 @@
     }
     textarea {
       width: 100%;
-      height: 120px;
+      height:;
       font-family: monospace;
       font-size: 1rem;
       padding: 0.5rem;
@@ -62,30 +62,6 @@
   <label for="body">Treść ogłoszenia</label>
   <textarea id="body" readonly></textarea>
   <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
-</div>
-
-<div class="block">
-  <label for="spec">Specyfikacja</label>
-  <textarea id="spec" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('spec')">Kliknij, aby skopiować</button>
-</div>
-
-<div class="block">
-  <label for="use">Zastosowanie</label>
-  <textarea id="use" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('use')">Kliknij, aby skopiować</button>
-</div>
-
-<div class="block">
-  <label for="info">Informacje dodatkowe</label>
-  <textarea id="info" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('info')">Kliknij, aby skopiować</button>
-</div>
-
-<div class="block">
-  <label for="kontakt">Kontakt (HTML)</label>
-  <textarea id="kontakt" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('kontakt')">Kliknij, aby skopiować</button>
 </div>
 
 <script>
@@ -127,6 +103,13 @@ function copyToClipboard(id) {
     }
   } catch (err) {
     alert("Nie udało się skopiować");
+  }
+}
+function autoResizeTextarea(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.height = "auto"; // resetuje
+    el.style.height = el.scrollHeight + "px"; // dopasowuje
   }
 }
 </script>
