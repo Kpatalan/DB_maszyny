@@ -163,7 +163,8 @@
     async function ladujDodaneDzis() {
       try {
         const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-        const dane = await res.json();
+        const json = await res.json();
+        const dane = json[0]?.response?.body || [];
         const kontener = document.getElementById("dodane-dzis");
         kontener.innerHTML = "";
 
@@ -179,8 +180,8 @@
           div.style.border = "1px solid #ddd";
           div.style.borderRadius = "8px";
           div.style.backgroundColor = "#fff";
-          const tytul = item.Produkty || "Brak tytułu";
-          const tresc = item.Data ? `Data: ${item.Data}` : "Brak treści";
+          const tytul = item["Produkty Nowe"] || "Brak tytułu";
+          const tresc = item["Data"] ? `Data: ${item["Data"]}` : "Brak treści";
           div.innerHTML = `
             <strong>${i + 1}. ${tytul}</strong><br />
             ${tresc}
