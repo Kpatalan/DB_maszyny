@@ -1,200 +1,141 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daschboard Poleasingowe.pl</title>
+  <meta charset="UTF-8">
+  <title>Ogłoszenie z PDF (Dane z webhooka n8n)</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      padding: 40px;
+      font-family: sans-serif;
+      background: #f4f4f4;
+      padding: 2rem;
     }
     h1 {
-      font-size: 36px;
-      font-weight: bold;
+      margin-bottom: 2rem;
     }
-    h2 {
-      font-size: 28px;
-      font-weight: normal;
-      color: #444;
+    .block {
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
-    .tabs {
-      margin-top: 20px;
-      display: flex;
-      gap: 24px;
-      font-size: 18px;
-    }
-    .tab {
-      cursor: pointer;
-      color: #999;
-      border-bottom: 2px solid transparent;
-      padding-bottom: 8px;
-    }
-    .tab.active {
-      color: #3730a3;
-      border-color: #3730a3;
-      font-weight: bold;
-    }
-    .tab-content {
-      display: none;
-      margin-top: 10px;
-      background-color: #f0f4ff;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-    }
-    .tab-content.active {
+    label {
       display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
     }
-    .container {
-      margin-top: 20px;
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: #f9f9f9;
+      overflow-y: hidden;
+      resize: none;
     }
-    #uploadForm {
-      margin-top: 15px;
-    }
-    #uploadForm input[type="file"] {
-      margin-bottom: 10px;
-    }
-    #uploadForm button {
-      display: flex;
-      align-items: center;
-      background-color: #3730a3;
-      color: white;
+    button.copy-btn {
+      margin-top: 0.5rem;
+      padding: 6px 12px;
+      background: #0077cc;
+      color: #fff;
       border: none;
-      padding: 10px 15px;
+      border-radius: 4px;
       cursor: pointer;
-      border-radius: 5px;
     }
-    #uploadForm button svg {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-      fill: white;
-    }
-    #loadingSpinner {
-      display: none;
-      margin-left: 10px;
-    }
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #3730a3;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    button.copy-btn:hover {
+      background: #005fa3;
     }
   </style>
 </head>
 <body>
-  <h1>Daschboard Poleasingowe.pl</h1>
-  <h2>Maszyny i urządzenia</h2>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="tab1">📋 Generator ogłoszeń</div>
-    <div class="tab" data-tab="tab2">Wylicytowane dziś</div>
-    <div class="tab" data-tab="tab3">Dodane dziś</div>
-  </div>
+<h1>Dane z webhooka (n8n)</h1>
 
-  <div id="tab1" class="tab-content active">
-    <div class="container">
-      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
-      <form
-        id="uploadForm"
-        action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
-        method="post"
-        enctype="multipart/form-data"
-        target="dummyFrame"
-      >
-        <input type="file" name="file" accept="application/pdf" required />
-        <button type="submit">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/></svg>
-          Wyślij PDF
-          <div id="loadingSpinner">
-            <div class="spinner"></div>
-          </div>
-        </button>
-      </form>
-    </div>
-  </div>
+<div class="block">
+  <label for="title">Tytuł ogłoszenia</label>
+  <textarea id="title" readonly></textarea>
+  <button class="copy-btn" onclick="copyToClipboard('title')">Kliknij, aby skopiować</button>
+</div>
 
-  <div id="tab2" class="tab-content">
-    Tutaj będą wylicytowane dzisiaj ogłoszenia.
-  </div>
+<div class="block">
+  <label for="body">Treść ogłoszenia</label>
+  <textarea id="body" readonly></textarea>
+  <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
+</div>
+<a href="upload.html" class="back-button">🔄 Generuj kolejne</a>
 
-  <div id="tab3" class="tab-content">
-    <h3>Dzisiejsze ogłoszenia:</h3>
-    <div id="dodane-dzis">Ładowanie danych...</div>
-  </div>
+<style>
+.back-button {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 10px 16px;
+  background-color: #3730a3;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+.back-button:hover {
+  background-color: #2c278d;
+}
+</style>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
 
-  <iframe name="dummyFrame" style="display:none;"></iframe>
+  const mapping = {
+    title: "title",
+    body: "body",
+    specyfikacja: "spec",
+    zastosowanie: "use",
+    info: "info",
+    kontakt: "kontakt"
+  };
 
-  <script>
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
-      });
-    });
-
-    document.getElementById('uploadForm').addEventListener('submit', function () {
-      document.getElementById('loadingSpinner').style.display = 'inline-block';
-      setTimeout(() => {
-        fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
-          method: 'POST',
-          body: new FormData(this)
-        })
-        .then(r => r.json())
-        .then(data => {
-          const params = new URLSearchParams(data).toString();
-          window.location.href = `ogloszenie.html?${params}`;
-        });
-      }, 2500);
-    });
-
-    async function ladujDodaneDzis() {
-      try {
-        const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-        const responseData = await res.json();
-        const dane = responseData.response?.body || [];
-        const kontener = document.getElementById("dodane-dzis");
-        kontener.innerHTML = "";
-
-        if (!Array.isArray(dane) || dane.length === 0) {
-          kontener.textContent = "Brak ogłoszeń.";
-          return;
-        }
-
-        dane.forEach((item, i) => {
-          const div = document.createElement("div");
-          div.style.marginBottom = "1.5rem";
-          div.style.padding = "1rem";
-          div.style.border = "1px solid #ddd";
-          div.style.borderRadius = "8px";
-          div.style.backgroundColor = "#fff";
-          const tytul = item["Produkty Nowe"] || "Brak tytułu";
-          const tresc = item.Data ? `Data: ${item.Data}` : "Brak treści";
-          div.innerHTML = `
-            <strong>${i + 1}. ${tytul}</strong><br />
-            ${tresc}
-          `;
-          kontener.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Błąd ładowania ogłoszeń:", err);
-        document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
+  for (const key in mapping) {
+    const val = params.get(key);
+    if (val) {
+      const el = document.getElementById(mapping[key]);
+      if (el) {
+        el.value = val;
+        autoResizeTextarea(mapping[key]);
       }
     }
+  }
+});
 
-    document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
-  </script>
+function copyToClipboard(id) {
+  const textarea = document.getElementById(id);
+  textarea.select();
+  textarea.setSelectionRange(0, 99999); // iOS fix
+
+  try {
+    const copied = document.execCommand("copy");
+    const button = textarea.nextElementSibling;
+    if (copied && button) {
+      const originalText = button.textContent;
+      button.textContent = "Skopiowano!";
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 1500);
+    }
+  } catch (err) {
+    alert("Nie udało się skopiować");
+  }
+}
+
+function autoResizeTextarea(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }
+}
+</script>
+
 </body>
 </html>
