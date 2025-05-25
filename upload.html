@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daschboard Poleasingowe.pl</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: bold;
+    }
+    h2 {
+      font-size: 28px;
+      font-weight: normal;
+      color: #444;
+    }
+    .tabs {
+      margin-top: 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 18px;
+    }
+    .tab {
+      cursor: pointer;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 8px;
+    }
+    .tab.active {
+      color: #3730a3;
+      border-color: #3730a3;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+      margin-top: 10px;
+      background-color: #f0f4ff;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .progress {
+      margin-top: 40px;
+    }
+    .progress-label {
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+    .progress-bar {
+      background-color: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 20px;
+      position: relative;
+    }
+    .progress-bar-fill {
+      background-color: #444;
+      height: 100%;
+      width: 0;
+      transition: width 0.5s ease;
+    }
+    .progress-percentage {
+      position: absolute;
+      top: -30px;
+      right: 0;
+      background-color: #444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    .brand-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #uploadForm {
+      margin-top: 15px;
+    }
+    #uploadForm input[type="file"] {
+      margin-bottom: 10px;
+    }
+    #uploadForm button {
+      display: flex;
+      align-items: center;
+      background-color: #3730a3;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #uploadForm button svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      fill: white;
+    }
+    #loadingSpinner {
+      display: none;
+      margin-left: 10px;
+    }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #3730a3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Daschboard Poleasingowe.pl</h1>
+  <h2>Maszyny i urządzenia</h2>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="tab1">&#128203; Generator ogłoszeń</div>
+    <div class="tab" data-tab="tab2">Wylicytowane dziś</div>
+    <div class="tab" data-tab="tab3">Dodane dziś</div>
+  </div>
+
+  <div id="tab1" class="tab-content active">
+    <div class="container">
+      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
+      <form
+        id="uploadForm"
+        action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+        method="post"
+        enctype="multipart/form-data"
+        target="dummyFrame"
+      >
+        <input type="file" name="file" accept="application/pdf" required />
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/></svg>
+          Wyślij PDF
+          <div id="loadingSpinner">
+            <div class="spinner"></div>
+          </div>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="tab2" class="tab-content">
+    Tutaj będą wylicytowane dzisiaj ogłoszenia.
+  </div>
+  <div id="tab3" class="tab-content">
+    Tutaj będą dodane dzisiaj ogłoszenia.
+  </div>
+
+  <div class="progress">
+    <div class="progress-label">progressbar 1</div>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" style="width: 40%"></div>
+      <div class="progress-percentage">40%</div>
+    </div>
+
+    <div class="progress-label" style="margin-top: 20px">progressbar 2</div>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" style="width: 70%"></div>
+      <div class="progress-percentage">70%</div>
+    </div>
+
+    <div class="progress-label" style="margin-top: 20px">progressbar 3</div>
+    <div class="progress-bar">
+      <div class="progress-bar-fill" style="width: 95%"></div>
+      <div class="progress-percentage">95%</div>
+    </div>
+  </div>
+
+  <!-- Ukryta ramka do wysyłki formularza -->
+  <iframe name="dummyFrame" style="display:none;"></iframe>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function () {
+      document.getElementById('loadingSpinner').style.display = 'inline-block';
+
+      setTimeout(() => {
+        window.location.href = 'https://docs.google.com/spreadsheets/d/1aBDY9ZiFpua2cxhFCpG2u_n9tXQcVbd8bMrEQaSCSQU/edit#gid=0';
+      }, 2500);
+    });
+  </script>
+</body>
+</html>
