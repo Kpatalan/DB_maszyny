@@ -196,5 +196,41 @@
       }, 2500);
     });
   </script>
+
+// Ładuj dane po kliknięciu zakładki "Dodane dziś"
+
+<script>
+async function ladujDodaneDzis() {
+  try {
+    const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/twoj-endpoint");
+    const dane = await res.json();
+
+    const kontener = document.getElementById("dodane-dzis");
+    kontener.innerHTML = ""; // wyczyść poprzednie
+
+    dane.forEach((item, i) => {
+      const div = document.createElement("div");
+      div.style.marginBottom = "1.5rem";
+      div.style.padding = "1rem";
+      div.style.border = "1px solid #ddd";
+      div.style.borderRadius = "8px";
+      div.style.backgroundColor = "#fff";
+      div.innerHTML = `
+        <strong>${i + 1}. ${item.title}</strong><br />
+        ${item.body.replace(/\n/g, "<br>")}<br />
+        <em>${item.info}</em>
+      `;
+      kontener.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Błąd ładowania ogłoszeń:", err);
+    document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
+  }
+}
+
+// Ładuj dane po kliknięciu zakładki "Dodane dziś"
+document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
+</script>
+
 </body>
 </html>
