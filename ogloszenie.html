@@ -58,43 +58,26 @@
 </div>
 
 <script>
-/* ---------- kopiowanie ---------- */
-function copyToClipboard(id){
-  const ta=document.getElementById(id);
-  ta.select(); document.execCommand('copy');
-  const btn=ta.nextElementSibling;
-  const t=btn.textContent;
-  btn.textContent='Skopiowano!';
-  setTimeout(()=>btn.textContent=t,1500);
-}
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
 
-/* ---------- pobieranie danych ---------- */
-/*
-   Jeśli pozostajesz przy modelu:
-   Webhook (POST) -> OpenAI -> Respond to Webhook
-   …i chcesz odebrać dane GET-em, dodaj w n8n dodatkowy webhook typu GET,
-   który zwraca „ostatni wygenerowany JSON”. W prostych testach możesz
-   wywołać POST bezpośrednio z JS (fetchOptions.method='POST').
-*/
-const fetchOptions = { method:'GET' };          // zmień na POST, jeśli trzeba
-const ENDPOINT     = 'https://TWÓJ_HOST/webhook-test/ogloszenie'; // ← URL
+  const mapping = {
+    title: "title",
+    body: "body",
+    specyfikacja: "spec",
+    zastosowanie: "use",
+    info: "info",
+    kontakt: "kontakt"
+  };
 
-async function loadData(){
-  try{
-    const r = await fetch(ENDPOINT, fetchOptions);
-    const data = await r.json();               // {title, body, …}
-
-    document.getElementById('title'   ).value = data.title   || '';
-    document.getElementById('body'    ).value = data.body    || '';
-    document.getElementById('spec'    ).value = data.specyfikacja || '';
-    document.getElementById('use'     ).value = data.zastosowanie  || '';
-    document.getElementById('info'    ).value = data.info    || '';
-    document.getElementById('kontakt' ).value = data.kontakt || '';
-  }catch(e){
-    alert('Błąd pobierania danych z webhooka: '+e);
+  for (const key in mapping) {
+    const val = params.get(key);
+    if (val) {
+      const el = document.getElementById(mapping[key]);
+      if (el) el.value = decodeURIComponent(val);
+    }
   }
-}
-
+});
 /* inicjalizacja */
 loadData();
 </script>
