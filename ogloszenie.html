@@ -64,7 +64,25 @@
   <textarea id="body" readonly></textarea>
   <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
 </div>
+<a href="upload.html" class="back-button">🔄 Generuj kolejne</a>
 
+<style>
+.back-button {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 10px 16px;
+  background-color: #3730a3;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+.back-button:hover {
+  background-color: #2c278d;
+}
+</style>
 <script>
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
