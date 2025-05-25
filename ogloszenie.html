@@ -26,13 +26,14 @@
     }
     textarea {
       width: 100%;
-      height:;
       font-family: monospace;
       font-size: 1rem;
       padding: 0.5rem;
       border: 1px solid #aaa;
       border-radius: 4px;
       background: #f9f9f9;
+      overflow-y: hidden;
+      resize: none;
     }
     button.copy-btn {
       margin-top: 0.5rem;
@@ -78,41 +79,4 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   for (const key in mapping) {
-    const val = params.get(key);
-    if (val) {
-      const el = document.getElementById(mapping[key]);
-      if (el) el.value = val;
-    }
-  }
-});
-
-function copyToClipboard(id) {
-  const textarea = document.getElementById(id);
-  textarea.select();
-  textarea.setSelectionRange(0, 99999); // iOS fix
-
-  try {
-    const copied = document.execCommand("copy");
-    const button = textarea.nextElementSibling;
-    if (copied && button) {
-      const originalText = button.textContent;
-      button.textContent = "Skopiowano!";
-      setTimeout(() => {
-        button.textContent = originalText;
-      }, 1500);
-    }
-  } catch (err) {
-    alert("Nie udało się skopiować");
-  }
-}
-function autoResizeTextarea(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.height = "auto"; // resetuje
-    el.style.height = el.scrollHeight + "px"; // dopasowuje
-  }
-}
-</script>
-
-</body>
-</html>
+    const
