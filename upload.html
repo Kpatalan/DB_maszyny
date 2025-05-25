@@ -130,11 +130,9 @@
     <div id="dodane-dzis">Ładowanie danych...</div>
   </div>
 
-  <!-- Ukryta ramka do wysyłki formularza -->
   <iframe name="dummyFrame" style="display:none;"></iframe>
 
   <script>
-    // Obsługa zakładek
     const tabs = document.querySelectorAll('.tab');
     const contents = document.querySelectorAll('.tab-content');
 
@@ -147,10 +145,8 @@
       });
     });
 
-    // Obsługa formularza
     document.getElementById('uploadForm').addEventListener('submit', function () {
       document.getElementById('loadingSpinner').style.display = 'inline-block';
-
       setTimeout(() => {
         fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
           method: 'POST',
@@ -164,15 +160,14 @@
       }, 2500);
     });
 
-    // Pobieranie ogłoszeń z Google Sheets via webhook (GET)
     async function ladujDodaneDzis() {
       try {
         const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
         const dane = await res.json();
         const kontener = document.getElementById("dodane-dzis");
-        kontener.innerHTML = ""; // wyczyść
+        kontener.innerHTML = "";
 
-        if (dane.length === 0) {
+        if (!Array.isArray(dane) || dane.length === 0) {
           kontener.textContent = "Brak ogłoszeń na dziś.";
           return;
         }
@@ -184,10 +179,11 @@
           div.style.border = "1px solid #ddd";
           div.style.borderRadius = "8px";
           div.style.backgroundColor = "#fff";
+          const tytul = item.Produkty || "Brak tytułu";
+          const tresc = item.Data ? `Data: ${item.Data}` : "Brak treści";
           div.innerHTML = `
-            <strong>${i + 1}. ${item.title || "Brak tytułu"}</strong><br />
-            ${item.body?.replace(/\n/g, "<br>") || "Brak treści"}<br />
-            <em>${item.info || ""}</em>
+            <strong>${i + 1}. ${tytul}</strong><br />
+            ${tresc}
           `;
           kontener.appendChild(div);
         });
@@ -197,7 +193,6 @@
       }
     }
 
-    // Załaduj dane po kliknięciu w zakładkę "Dodane dziś"
     document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
   </script>
 </body>
