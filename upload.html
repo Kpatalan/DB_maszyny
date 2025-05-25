@@ -4,200 +4,137 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daschboard Poleasingowe.pl</title>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      padding: 40px;
-    }
-    h1 {
-      font-size: 36px;
-      font-weight: bold;
-    }
-    h2 {
-      font-size: 28px;
-      font-weight: normal;
-      color: #444;
-    }
-    .tabs {
-      margin-top: 20px;
-      display: flex;
-      gap: 24px;
-      font-size: 18px;
-    }
-    .tab {
-      cursor: pointer;
-      color: #999;
-      border-bottom: 2px solid transparent;
-      padding-bottom: 8px;
-    }
-    .tab.active {
-      color: #3730a3;
-      border-color: #3730a3;
-      font-weight: bold;
-    }
-    .tab-content {
-      display: none;
-      margin-top: 10px;
-      background-color: #f0f4ff;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .container {
-      margin-top: 20px;
-    }
-    #uploadForm {
-      margin-top: 15px;
-    }
-    #uploadForm input[type="file"] {
-      margin-bottom: 10px;
-    }
-    #uploadForm button {
-      display: flex;
-      align-items: center;
-      background-color: #3730a3;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    #uploadForm button svg {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-      fill: white;
-    }
-    #loadingSpinner {
-      display: none;
-      margin-left: 10px;
-    }
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #3730a3;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    /* ——————  TYPO / LAYOUT  —————— */
+    body{font-family:Arial,Helvetica,sans-serif;background:#fff;padding:40px 40px 80px}
+    h1{font-size:36px;font-weight:700;margin:0 0 10px}
+    h2{font-size:28px;font-weight:400;color:#444;margin:0 0 30px}
+
+    /* ——————  TABS  —————— */
+    .tabs{display:flex;gap:24px;font-size:18px;margin-bottom:10px}
+    .tab{cursor:pointer;color:#999;padding-bottom:8px;border-bottom:2px solid transparent}
+    .tab.active{color:#3730a3;border-color:#3730a3;font-weight:700}
+
+    .tab-content{display:none;background:#f0f4ff;border:1px solid #e5e7eb;padding:20px;margin-top:8px}
+    .tab-content.active{display:block}
+
+    /* ——————  GENERATOR  —————— */
+    #uploadForm{margin-top:15px}
+    #uploadForm input[type=file]{margin-bottom:10px}
+    #uploadForm button{display:flex;align-items:center;gap:8px;background:#3730a3;color:#fff;
+                       border:none;border-radius:5px;padding:10px 15px;cursor:pointer}
+    #uploadForm button svg{width:20px;height:20px;fill:#fff}
+    #loadingSpinner{display:none}
+    .spinner{width:16px;height:16px;border:2px solid #ccc;border-top:2px solid #3730a3;
+             border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+    /* ——————  LISTA OGŁOSZEŃ  —————— */
+    .item{background:#fff;border:1px solid #ddd;border-radius:8px;padding:1rem;margin-bottom:1rem}
+    .item strong{font-size:16px;font-weight:700}
   </style>
 </head>
 <body>
+
   <h1>Daschboard Poleasingowe.pl</h1>
   <h2>Maszyny i urządzenia</h2>
 
+  <!-- ────── TABS NAV ────── -->
   <div class="tabs">
-    <div class="tab active" data-tab="tab1">&#128203; Generator ogłoszeń</div>
+    <div class="tab active" data-tab="tab1">🖨️ Generator ogłoszeń</div>
     <div class="tab" data-tab="tab2">Wylicytowane dziś</div>
     <div class="tab" data-tab="tab3">Dodane dziś</div>
   </div>
 
+  <!-- ────── TAB 1  (GENERATOR) ────── -->
   <div id="tab1" class="tab-content active">
-    <div class="container">
-      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
-      <form
-        id="uploadForm"
-        action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
-        method="post"
-        enctype="multipart/form-data"
-        target="dummyFrame"
-      >
-        <input type="file" name="file" accept="application/pdf" required />
-        <button type="submit">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/></svg>
-          Wyślij PDF
-          <div id="loadingSpinner">
-            <div class="spinner"></div>
-          </div>
-        </button>
-      </form>
-    </div>
+    <h3>Wyślij plik PDF do generatora ogłoszeń</h3>
+
+    <form id="uploadForm"
+          action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+          method="post" enctype="multipart/form-data" target="dummyFrame">
+      <input type="file" name="file" accept="application/pdf" required>
+      <button type="submit">
+        <!-- upload icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/></svg>
+        Wyślij PDF
+        <span id="loadingSpinner"><span class="spinner"></span></span>
+      </button>
+    </form>
   </div>
 
+  <!-- ────── TAB 2  (WYLICYTOWANE) ────── -->
   <div id="tab2" class="tab-content">
     Tutaj będą wylicytowane dzisiaj ogłoszenia.
   </div>
 
+  <!-- ────── TAB 3  (DODANE DZIŚ) ────── -->
   <div id="tab3" class="tab-content">
     <h3>Dzisiejsze ogłoszenia:</h3>
-    <div id="dodane-dzis">Ładowanie danych...</div>
+    <div id="dodane-dzis">⚙️ Ładowanie…</div>
   </div>
 
-  <iframe name="dummyFrame" style="display:none;"></iframe>
+  <!-- ukryty iframe dla submitu -->
+  <iframe name="dummyFrame" style="display:none"></iframe>
 
   <script>
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
-      });
+  /* ──────  obsługa TABS  ────── */
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      tabs.forEach(t=>t.classList.remove('active'));
+      contents.forEach(c=>c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
     });
+  });
 
-    document.getElementById('uploadForm').addEventListener('submit', function () {
-      document.getElementById('loadingSpinner').style.display = 'inline-block';
-      setTimeout(() => {
-        fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
-          method: 'POST',
-          body: new FormData(this)
+  /* ──────  upload PDF  ────── */
+  document.getElementById('uploadForm').addEventListener('submit',function(){
+    document.getElementById('loadingSpinner').style.display='inline-block';
+    // opcjonalnie: po wysłaniu przekieruj na wygenerowany szablon:
+    setTimeout(()=>{
+      fetch(this.action,{method:'POST',body:new FormData(this)})
+        .then(r=>r.json())
+        .then(d=>{
+          const q=new URLSearchParams(d).toString();
+          window.location.href='ogloszenie.html?'+q;
         })
-        .then(r => r.json())
-        .then(data => {
-          const params = new URLSearchParams(data).toString();
-          window.location.href = `ogloszenie.html?${params}`;
-        });
-      }, 2500);
-    });
-<script>
-async function ladujDodaneDzis() {
-  const kontener = document.getElementById("dodane-dzis");
-  kontener.textContent = "Ładowanie…";
+        .catch(()=>alert('Błąd wysyłki'));
+    },2500);
+  });
 
-  try {
-    const res  = await fetch(
-      "https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2"
-    );
-    /** @type {string[]} */
-    const produkty = await res.json();
-
-    kontener.innerHTML = "";                     // wyczyść
-    if (!Array.isArray(produkty) || !produkty.length) {
-      kontener.textContent = "Brak ogłoszeń.";
-      return;
+  /* ──────  pobieranie LISTY  ────── */
+  async function ladujDodaneDzis(){
+    const box=document.getElementById('dodane-dzis');
+    box.textContent='⚙️ Ładowanie…';
+    try{
+      // webhook GET -> zwraca tablicę STRINGÓW (kolumna „Produkty Nowe” bez pustych)
+      const res=await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
+      const arr=await res.json();                  // ["Produkt 1","Produkt 2", ...]
+      box.innerHTML='';
+      if(!Array.isArray(arr)||!arr.length){
+        box.textContent='Brak ogłoszeń.';
+        return;
+      }
+      arr.forEach((txt,i)=>{
+        const div=document.createElement('div');
+        div.className='item';
+        div.innerHTML=`<strong>${i+1}. ${txt}</strong>`;
+        box.appendChild(div);
+      });
+    }catch(e){
+      console.error(e);
+      box.textContent='Błąd ładowania danych.';
     }
-
-    produkty.forEach((p, idx) => {
-      const div = document.createElement("div");
-      div.style.cssText =
-        "margin:0 0 1rem 0;padding:1rem;background:#fff;border:1px solid #ddd;border-radius:8px";
-      div.innerHTML = `<strong>${idx + 1}. ${p}</strong>`;
-      kontener.appendChild(div);
-    });
-  } catch (e) {
-    console.error(e);
-    kontener.textContent = "Błąd ładowania danych.";
   }
-}
+  /* pobieraj przy KAŻDYM wejściu na zakładkę „Dodane dziś” */
+  document.querySelector('[data-tab="tab3"]').addEventListener('click',ladujDodaneDzis);
 
-// uruchamiaj tylko po kliknięciu zakładki „Dodane dziś”
-document
-  .querySelector('[data-tab="tab3"]')
-  .addEventListener("click", ladujDodaneDzis);
-</script>
-
-
-    document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
+  // (opcjonalnie) wczytaj od razu przy pierwszym otwarciu strony:
+  // ladujDodaneDzis();
   </script>
 </body>
 </html>
