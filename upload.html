@@ -46,42 +46,8 @@
     .tab-content.active {
       display: block;
     }
-    .progress {
-      margin-top: 40px;
-    }
-    .progress-label {
-      margin-bottom: 4px;
-      font-size: 16px;
-    }
-    .progress-bar {
-      background-color: #e5e7eb;
-      border-radius: 6px;
-      overflow: hidden;
-      height: 20px;
-      position: relative;
-    }
-    .progress-bar-fill {
-      background-color: #444;
-      height: 100%;
-      width: 0;
-      transition: width 0.5s ease;
-    }
-    .progress-percentage {
-      position: absolute;
-      top: -30px;
-      right: 0;
-      background-color: #444;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 14px;
-    }
     .container {
       margin-top: 20px;
-    }
-    .brand-title {
-      font-size: 24px;
-      font-weight: bold;
     }
     #uploadForm {
       margin-top: 15px;
@@ -158,16 +124,17 @@
   <div id="tab2" class="tab-content">
     Tutaj będą wylicytowane dzisiaj ogłoszenia.
   </div>
-   <div id="tab3" class="tab-content">
-  <h3>Dzisiejsze ogłoszenia:</h3>
-  <div id="dodane-dzis"></div>
-</div>
+
+  <div id="tab3" class="tab-content">
+    <h3>Dzisiejsze ogłoszenia:</h3>
+    <div id="dodane-dzis">Ładowanie danych...</div>
   </div>
 
   <!-- Ukryta ramka do wysyłki formularza -->
   <iframe name="dummyFrame" style="display:none;"></iframe>
 
   <script>
+    // Obsługa zakładek
     const tabs = document.querySelectorAll('.tab');
     const contents = document.querySelectorAll('.tab-content');
 
@@ -180,57 +147,58 @@
       });
     });
 
+    // Obsługa formularza
     document.getElementById('uploadForm').addEventListener('submit', function () {
       document.getElementById('loadingSpinner').style.display = 'inline-block';
 
       setTimeout(() => {
         fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
-  method: 'POST',
-  body: new FormData(this)
-})
-.then(r => r.json())
-.then(data => {
-  const params = new URLSearchParams(data).toString();
-  window.location.href = `ogloszenie.html?${params}`;
-});
+          method: 'POST',
+          body: new FormData(this)
+        })
+        .then(r => r.json())
+        .then(data => {
+          const params = new URLSearchParams(data).toString();
+          window.location.href = `ogloszenie.html?${params}`;
+        });
       }, 2500);
     });
+
+    // Pobieranie ogłoszeń z Google Sheets via webhook (GET)
+    async function ladujDodaneDzis() {
+      try {
+        const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
+        const dane = await res.json();
+        const kontener = document.getElementById("dodane-dzis");
+        kontener.innerHTML = ""; // wyczyść
+
+        if (dane.length === 0) {
+          kontener.textContent = "Brak ogłoszeń na dziś.";
+          return;
+        }
+
+        dane.forEach((item, i) => {
+          const div = document.createElement("div");
+          div.style.marginBottom = "1.5rem";
+          div.style.padding = "1rem";
+          div.style.border = "1px solid #ddd";
+          div.style.borderRadius = "8px";
+          div.style.backgroundColor = "#fff";
+          div.innerHTML = `
+            <strong>${i + 1}. ${item.title || "Brak tytułu"}</strong><br />
+            ${item.body?.replace(/\n/g, "<br>") || "Brak treści"}<br />
+            <em>${item.info || ""}</em>
+          `;
+          kontener.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Błąd ładowania ogłoszeń:", err);
+        document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
+      }
+    }
+
+    // Załaduj dane po kliknięciu w zakładkę "Dodane dziś"
+    document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
   </script>
-
-// Ładuj dane po kliknięciu zakładki "Dodane dziś"
-
-<script>
-async function ladujDodaneDzis() {
-  try {
-    const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-    const dane = await res.json();
-
-    const kontener = document.getElementById("dodane-dzis");
-    kontener.innerHTML = ""; // wyczyść poprzednie
-
-    dane.forEach((item, i) => {
-      const div = document.createElement("div");
-      div.style.marginBottom = "1.5rem";
-      div.style.padding = "1rem";
-      div.style.border = "1px solid #ddd";
-      div.style.borderRadius = "8px";
-      div.style.backgroundColor = "#fff";
-      div.innerHTML = `
-        <strong>${i + 1}. ${item.title}</strong><br />
-        ${item.body.replace(/\n/g, "<br>")}<br />
-        <em>${item.info}</em>
-      `;
-      kontener.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Błąd ładowania ogłoszeń:", err);
-    document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
-  }
-}
-
-// Ładuj dane po kliknięciu zakładki "Dodane dziś"
-document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
-</script>
-
 </body>
 </html>
