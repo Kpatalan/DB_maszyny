@@ -159,38 +159,43 @@
         });
       }, 2500);
     });
+<script>
+async function ladujDodaneDzis() {
+  const kontener = document.getElementById("dodane-dzis");
+  kontener.textContent = "Ładowanie…";
 
- async function ladujDodaneDzis() {
   try {
-    const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-    const dane = await res.json();
-    const kontener = document.getElementById("dodane-dzis");
-    kontener.innerHTML = "";
+    const res  = await fetch(
+      "https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2"
+    );
+    /** @type {string[]} */
+    const produkty = await res.json();
 
-    if (!Array.isArray(dane) || dane.length === 0) {
-      kontener.textContent = "Brak ogłoszeń na dziś.";
+    kontener.innerHTML = "";                     // wyczyść
+    if (!Array.isArray(produkty) || !produkty.length) {
+      kontener.textContent = "Brak ogłoszeń.";
       return;
     }
 
-    dane.forEach((item, i) => {
+    produkty.forEach((p, idx) => {
       const div = document.createElement("div");
-      div.style.marginBottom = "1.5rem";
-      div.style.padding = "1rem";
-      div.style.border = "1px solid #ddd";
-      div.style.borderRadius = "8px";
-      div.style.backgroundColor = "#fff";
-
-      const tytul = item.tytul?.trim() || "Brak tytułu";
-      const data = item.data?.trim() || "Brak treści";
-
-      div.innerHTML = `<strong>${i + 1}. ${tytul}</strong><br />${data}`;
+      div.style.cssText =
+        "margin:0 0 1rem 0;padding:1rem;background:#fff;border:1px solid #ddd;border-radius:8px";
+      div.innerHTML = `<strong>${idx + 1}. ${p}</strong>`;
       kontener.appendChild(div);
     });
-  } catch (err) {
-    console.error("Błąd ładowania ogłoszeń:", err);
-    document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
+  } catch (e) {
+    console.error(e);
+    kontener.textContent = "Błąd ładowania danych.";
   }
 }
+
+// uruchamiaj tylko po kliknięciu zakładki „Dodane dziś”
+document
+  .querySelector('[data-tab="tab3"]')
+  .addEventListener("click", ladujDodaneDzis);
+</script>
+
 
     document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
   </script>
