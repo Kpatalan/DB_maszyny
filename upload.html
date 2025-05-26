@@ -134,83 +134,103 @@
 
   <iframe name="dummyFrame" style="display:none;"></iframe>
 
-  <script>
-    // --- TABS ---
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
+<script>
+/* -----------------------------  TABS  ----------------------------- */
+const tabs      = document.querySelectorAll('.tab');
+const contents  = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs     .forEach(t => t.classList.remove('active'));
+    contents .forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+
+    /* Jeżeli kliknięto zakładkę „Dodane dziś”, ładujemy dane */
+    if (tab.dataset.tab === 'tab3') ladujDodaneDzis();
+  });
+});
+
+/* -----------------------  UPLOAD PDF FORM  ------------------------ */
+document.getElementById('uploadForm').addEventListener('submit', function (e) {
+  document.getElementById('loadingSpinner').style.display = 'inline-block';
+  setTimeout(() => {
+    fetch(this.action, { method: 'POST', body: new FormData(this) })
+      .then(r => r.json())
+      .then(data => {
+        const params = new URLSearchParams(data).toString();
+        window.location.href = `ogloszenie.html?${params}`;
+      })
+      .catch(err => {
+        console.error('Błąd uploadu PDF:', err);
+        alert('Nie udało się wysłać PDF.');
       });
+  }, 2500);
+  e.preventDefault();
+});
+
+/* ---------------------  ŁADOWANIE „DODANE”  ----------------------- */
+async function ladujDodaneDzis() {
+  const kontener = document.getElementById('dodane-dzis');
+  kontener.textContent = 'Ładuję…';
+
+  try {
+    const res   = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2', {
+      /**  W razie problemów CORS można aktywować:  mode: 'cors'  **/
     });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    // --- UPLOAD PDF FORM ---
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
-      document.getElementById('loadingSpinner').style.display = 'inline-block';
-      setTimeout(() => {
-        fetch(this.action, {
-          method: 'POST',
-          body: new FormData(this)
-        })
-        .then(r => r.json())
-        .then(data => {
-          const params = new URLSearchParams(data).toString();
-          window.location.href = `ogloszenie.html?${params}`;
-        })
-        .catch(err => {
-          console.error("Błąd uploadu PDF:", err);
-          alert("Nie udało się wysłać PDF.");
-        });
-      }, 2500);
-      e.preventDefault();
-    });
+    const wynik = await res.json();
+    console.log('Odebrana odpowiedź z webhooka:', wynik);   // <-- Debug
 
-    // --- ŁADOWANIE DODANE DZIŚ (podmieniony skrypt) ---
-    async function ladujDodaneDzis() {
-      const kontener = document.getElementById("dodane-dzis");
-      kontener.textContent = "Ładuję…";
-      try {
-        const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const wynik = await res.json();
-        const dane = wynik.response?.body || [];
+    /*  Spróbuj znaleźć tablicę z wierszami w najczęstszych miejscach  */
+    const dane = Array.isArray(wynik)                 ? wynik
+               : Array.isArray(wynik.body)            ? wynik.body
+               : Array.isArray(wynik.data)            ? wynik.data
+               : Array.isArray(wynik.response?.body)  ? wynik.response.body
+               : [];
 
-        // Wyciągamy wszystkie Produkty Nowe, pomijając puste
-        const produkty = dane
-          .map(r => (r["Produkty Nowe"] || "").trim())
-          .filter(p => p !== "");
-
-        if (produkty.length === 0) {
-          kontener.textContent = "Brak dostępnych produktów.";
-          return;
-        }
-
-        kontener.innerHTML = "";
-        produkty.forEach((prod, i) => {
-          const div = document.createElement("div");
-          Object.assign(div.style, {
-            marginBottom:    "1.5rem",
-            padding:         "1rem",
-            border:          "1px solid #ddd",
-            borderRadius:    "8px",
-            backgroundColor: "#fff",
-          });
-          div.innerHTML = `<strong>${i+1}. ${prod}</strong>`;
-          kontener.appendChild(div);
-        });
-
-      } catch(err) {
-        console.error("Błąd ładowania ogłoszeń:", err);
-        kontener.textContent = "Błąd ładowania danych.";
-      }
+    if (!Array.isArray(dane) || dane.length === 0) {
+      kontener.textContent = 'Brak danych lub niepoprawny format odpowiedzi.';
+      return;
     }
 
-    // Podłącz loader do kliknięcia zakładki
-    document.querySelector('[data-tab="tab3"]')
-            .addEventListener("click", ladujDodaneDzis);
-  </script>
+    /*  Wyciągnij wszystkie nie-puste „Produkty Nowe”  */
+    const produkty = dane
+      .map(r => (r['Produkty Nowe'] || '').trim())
+      .filter(txt => txt !== '');
+
+    if (produkty.length === 0) {
+      kontener.textContent = 'Brak dostępnych produktów.';
+      return;
+    }
+
+    /*  Renderuj listę  */
+    kontener.innerHTML = '';
+    produkty.forEach((prod, i) => {
+      const div = document.createElement('div');
+      Object.assign(div.style, {
+        marginBottom:    '1.5rem',
+        padding:         '1rem',
+        border:          '1px solid #ddd',
+        borderRadius:    '8px',
+        backgroundColor: '#fff',
+      });
+      div.innerHTML = `<strong>${i + 1}. ${prod}</strong>`;
+      kontener.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error('Błąd ładowania ogłoszeń:', err);
+    kontener.textContent = 'Błąd ładowania danych.';
+  }
+}
+
+/*  Gdyby zakładka „Dodane dziś” była aktywna już po załadowaniu strony  */
+if (document.querySelector('[data-tab="tab3"]').classList.contains('active')) {
+  ladujDodaneDzis();
+}
+</script>
+
 </body>
 </html>
