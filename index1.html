@@ -154,7 +154,21 @@
     </div>
 
     <div id="tab2" class="tab-content">
-      <p>Tutaj będą wylicytowane dzisiaj ogłoszenia.</p>
+     <table id="wylicytowaneTabela" border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; background: #fff;">
+  <thead>
+    <tr>
+      <th>Kod produktu</th>
+      <th>Kod aukcji</th>
+      <th>Tytuł aukcji</th>
+      <th>Zwycięzca aukcji</th>
+      <th>Cena wywoławcza</th>
+      <th>Aktualna cena</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>
+  </tbody>
+</table>
     </div>
 
     <div id="tab3" class="tab-content">
@@ -178,6 +192,7 @@
         document.getElementById(link.dataset.tab).classList.add('active');
 
         if (link.dataset.tab === 'tab3') ladujDodaneDzis();
+        if (link.dataset.tab === 'tab2') ladujWylicytowane();
       });
     });
 
@@ -200,6 +215,41 @@
     });
 
     // Ładowanie ogłoszeń
+async function ladujWylicytowane() {
+  const tabela = document.querySelector('#wylicytowaneTabela tbody');
+  tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>`;
+
+  try {
+    const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/3f1a9037-34f4-4f70-a1da-974e230e45c7');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const dane = await res.json();
+
+    if (!Array.isArray(dane) || dane.length === 0) {
+      tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Brak danych.</td></tr>`;
+      return;
+    }
+
+    tabela.innerHTML = '';
+    dane.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item["Kod produktu"] || '-'}</td>
+        <td>${item["Kod aukcji"] || '-'}</td>
+        <td>${item["Tytuł aukcji"] || '-'}</td>
+        <td>${item["Zwycięca aukcji"] || '-'}</td>
+        <td>${item["Cena wywoławcza"] || '-'}</td>
+        <td>${item["Aktualna cena"] || '-'}</td>
+      `;
+      tabela.appendChild(row);
+    });
+
+  } catch (err) {
+    console.error('Błąd ładowania wylicytowanych:', err);
+    tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Błąd ładowania danych.</td></tr>`;
+  }
+}
+
     async function ladujDodaneDzis() {
       const kontener = document.getElementById('dodane-dzis');
       kontener.textContent = 'Ładuję…';
