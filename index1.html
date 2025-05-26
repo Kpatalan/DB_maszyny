@@ -40,10 +40,14 @@
       padding: 12px 20px;
       display: block;
       transition: background 0.3s;
+      cursor: pointer;
     }
 
-    .sidebar a:hover {
+    .sidebar a:hover,
+    .sidebar a.active {
       background-color: #457b9d;
+      font-weight: bold;
+      color: #ffffff;
     }
 
     .main {
@@ -57,31 +61,6 @@
       color: white;
       padding: 16px 24px;
       font-size: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .tabs {
-      display: flex;
-      background-color: white;
-      border-bottom: 2px solid #ccc;
-      padding-left: 24px;
-    }
-
-    .tab {
-      padding: 12px 20px;
-      margin-right: 12px;
-      cursor: pointer;
-      color: #6c757d;
-      border-bottom: 3px solid transparent;
-      transition: 0.2s;
-    }
-
-    .tab.active {
-      color: #1d3557;
-      font-weight: bold;
-      border-color: #1d3557;
     }
 
     .tab-content {
@@ -146,29 +125,13 @@
 <body>
   <div class="sidebar">
     <h2>AfterLease BOX</h2>
-    <a href="#">📊 Kokpit Operatora</a>
-    <a href="#">📦 Produkty</a>
-    <a href="#">🔔 Aukcje</a>
-    <a href="#">💬 Komunikacja</a>
-    <a href="#">📈 Raporty</a>
-    <a href="#">📊 Statystyki</a>
-    <a href="#">📄 Ekstrakty</a>
-    <a href="#">👤 Użytkownicy</a>
-    <a href="#">🏢 Podmioty oper.</a>
-    <a href="#">📂 Kategorie</a>
-    <a href="#">🔐 Bezpieczeństwo</a>
-    <a href="#">⚙️ Konfiguracja</a>
-    <a href="#">🖥️ Monitoring</a>
+    <a class="tab-link active" data-tab="tab1">🗃️ Generator ogłoszeń</a>
+    <a class="tab-link" data-tab="tab2">📈 Wylicytowane dziś</a>
+    <a class="tab-link" data-tab="tab3">🆕 Dodane dziś</a>
   </div>
 
   <div class="main">
     <div class="header">📆 Dashboard Poleasingowe.pl</div>
-
-    <div class="tabs">
-      <div class="tab active" data-tab="tab1">🗃️ Generator ogłoszeń</div>
-      <div class="tab" data-tab="tab2">Wylicytowane dziś</div>
-      <div class="tab" data-tab="tab3">Dodane dziś</div>
-    </div>
 
     <div id="tab1" class="tab-content active">
       <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
@@ -203,18 +166,18 @@
   </div>
 
   <script>
-    // Obsługa zakładek
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
+    // Obsługa bocznych zakładek
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).classList.add('active');
+    tabLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        tabLinks.forEach(l => l.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        link.classList.add('active');
+        document.getElementById(link.dataset.tab).classList.add('active');
 
-        if (tab.dataset.tab === 'tab3') ladujDodaneDzis();
+        if (link.dataset.tab === 'tab3') ladujDodaneDzis();
       });
     });
 
@@ -286,7 +249,7 @@
       }
     }
 
-    // Jeśli zakładka 3 jest aktywna po załadowaniu strony
+    // Automatyczne ładowanie tab3 jeśli aktywna
     if (document.querySelector('[data-tab="tab3"]').classList.contains('active')) {
       ladujDodaneDzis();
     }
