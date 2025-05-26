@@ -160,43 +160,58 @@
       }, 2500);
     });
 
-    async function ladujDodaneDzis() {
-      try {
-        const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-        const wynik = await res.json();
-        const dane = wynik.response?.body || [];
+   async function ladujDodaneDzis() {
+  try {
+    const res   = await fetch("https://…/webhook/374d6c55-…");
+    const wynik = await res.json();
+    const dane  = wynik.response?.body || [];
 
-        const dzisiaj = new Date().toISOString().slice(0, 10);
-        const kontener = document.getElementById("dodane-dzis");
-        kontener.innerHTML = "";
+    const dzisiaj = new Date().toISOString().slice(0,10);
+    const kontener = document.getElementById("dodane-dzis");
+    kontener.innerHTML = "";
 
-        const dzisiejsze = dane.filter(item => item["Data"] === dzisiaj || item["Data"] === "");
+    let currentDate = null;
+    const dzisiejszeProdukty = [];
 
-        if (dzisiejsze.length === 0) {
-          kontener.textContent = "Brak ogłoszeń na dziś.";
-          return;
+    dane.forEach(item => {
+      // jeżeli w komórce "Data" jest coś więcej niż "", to to traktuj jako nową datę
+      if (item["Data"]) {
+        currentDate = item["Data"];
+      } else {
+        // jeżeli natomiast puste, to wiersz z produktem
+        // i jeżeli bieżąca currentDate równa się dzisiaj — zbieraj
+        if (currentDate === dzisiaj) {
+          dzisiejszeProdukty.push(item["Produkty Nowe"] || "– brak tytułu –");
         }
-
-        dzisiejsze.forEach((item, i) => {
-          const div = document.createElement("div");
-          div.style.marginBottom = "1.5rem";
-          div.style.padding = "1rem";
-          div.style.border = "1px solid #ddd";
-          div.style.borderRadius = "8px";
-          div.style.backgroundColor = "#fff";
-          const tytul = item["Produkty Nowe"] || "Brak tytułu";
-          const data = item["Data"] ? `Data: ${item["Data"]}` : "Brak daty";
-          div.innerHTML = `
-            <strong>${i + 1}. ${tytul}</strong><br />
-            ${data}
-          `;
-          kontener.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Błąd ładowania ogłoszeń:", err);
-        document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
       }
+    });
+
+    if (dzisiejszeProdukty.length === 0) {
+      kontener.textContent = "Brak ogłoszeń na dziś.";
+      return;
     }
+
+    // wstaw każdy produkt jako osobny blok
+    dzisiejszeProdukty.forEach((prod, i) => {
+      const div = document.createElement("div");
+      div.style.marginBottom   = "1.5rem";
+      div.style.padding        = "1rem";
+      div.style.border         = "1px solid #ddd";
+      div.style.borderRadius   = "8px";
+      div.style.backgroundColor= "#fff";
+      div.innerHTML = `<strong>${i+1}. ${prod}</strong>`;
+      kontener.appendChild(div);
+    });
+
+  } catch(err) {
+    console.error("Błąd ładowania ogłoszeń:", err);
+    document.getElementById("dodane-dzis").textContent = "Błąd ładowania danych.";
+  }
+}
+
+// Podłączamy loader do kliknięcia na zakładkę
+document.querySelector('[data-tab="tab3"]')
+        .addEventListener("click", ladujDodaneDzis);
 
     document.querySelector('[data-tab="tab3"]').addEventListener("click", ladujDodaneDzis);
   </script>
