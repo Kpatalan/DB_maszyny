@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daschboard Poleasingowe.pl</title>
+  <title>Dashboard Poleasingowe.pl</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -90,7 +90,7 @@
   </style>
 </head>
 <body>
-  <h1>Daschboard Poleasingowe.pl</h1>
+  <h1>Dashboard Poleasingowe.pl</h1>
   <h2>Maszyny i urządzenia</h2>
 
   <div class="tabs">
@@ -111,7 +111,9 @@
       >
         <input type="file" name="file" accept="application/pdf" required />
         <button type="submit">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/>
+          </svg>
           Wyślij PDF
           <div id="loadingSpinner">
             <div class="spinner"></div>
@@ -122,7 +124,7 @@
   </div>
 
   <div id="tab2" class="tab-content">
-    Tutaj będą wylicytowane dzisiaj ogłoszenia.
+    <p>Tutaj będą wylicytowane dzisiaj ogłoszenia.</p>
   </div>
 
   <div id="tab3" class="tab-content">
@@ -133,9 +135,9 @@
   <iframe name="dummyFrame" style="display:none;"></iframe>
 
   <script>
+    // --- TABS ---
     const tabs = document.querySelectorAll('.tab');
     const contents = document.querySelectorAll('.tab-content');
-
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
@@ -145,10 +147,12 @@
       });
     });
 
-    document.getElementById('uploadForm').addEventListener('submit', function () {
+    // --- UPLOAD PDF FORM ---
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
       document.getElementById('loadingSpinner').style.display = 'inline-block';
+      // fetch w tle, przekierowanie nastąpi manualnie po wyniku
       setTimeout(() => {
-        fetch('https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e', {
+        fetch(this.action, {
           method: 'POST',
           body: new FormData(this)
         })
@@ -156,59 +160,67 @@
         .then(data => {
           const params = new URLSearchParams(data).toString();
           window.location.href = `ogloszenie.html?${params}`;
+        })
+        .catch(err => {
+          console.error("Błąd uploadu PDF:", err);
+          alert("Nie udało się wysłać PDF.");
         });
       }, 2500);
+      // zapobiegamy domyślnemu targetowaniu do iframe
+      e.preventDefault();
     });
 
-<script>
-  async function ladujDodaneDzis() {
-    try {
-      const res   = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
-      const wynik = await res.json();
-      const dane  = wynik.response?.body || [];
-
-      const dzisiaj = new Date().toISOString().slice(0,10);
+    // --- ŁADOWANIE DODANE DZIŚ ---
+    async function ladujDodaneDzis() {
       const kontener = document.getElementById("dodane-dzis");
-      kontener.innerHTML = "";
+      kontener.textContent = "Ładuję…";
+      try {
+        const res = await fetch("https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const wynik = await res.json();
+        const dane = wynik.response?.body || [];
 
-      let currentDate = null;
-      const dzisiejszeProdukty = [];
+        const dzisiaj = new Date().toISOString().slice(0,10);
+        let currentDate = null;
+        const dzisiejszeProdukty = [];
 
-      dane.forEach(row => {
-        if (row["Data"]) {
-          currentDate = row["Data"];
-        } else if (currentDate === dzisiaj) {
-          dzisiejszeProdukty.push(row["Produkty Nowe"] || "– brak tytułu –");
-        }
-      });
-
-      if (!dzisiejszeProdukty.length) {
-        kontener.textContent = "Brak ogłoszeń na dziś.";
-        return;
-      }
-
-      dzisiejszeProdukty.forEach((prod, i) => {
-        const div = document.createElement("div");
-        Object.assign(div.style, {
-          marginBottom:    "1.5rem",
-          padding:         "1rem",
-          border:          "1px solid #ddd",
-          borderRadius:    "8px",
-          backgroundColor: "#fff",
+        dane.forEach(row => {
+          if (row["Data"]) {
+            currentDate = row["Data"];
+          } else if (currentDate === dzisiaj) {
+            dzisiejszeProdukty.push(row["Produkty Nowe"] || "– brak tytułu –");
+          }
         });
-        div.innerHTML = `<strong>${i+1}. ${prod}</strong>`;
-        kontener.appendChild(div);
-      });
 
-    } catch(err) {
-      console.error("Błąd ładowania ogłoszeń:", err);
-      document.getElementById("dodane-dzis")
-              .textContent = "Błąd ładowania danych.";
+        if (dzisiejszeProdukty.length === 0) {
+          kontener.textContent = "Brak ogłoszeń na dziś.";
+          return;
+        }
+
+        // Wypisz każdy produkt
+        kontener.innerHTML = "";
+        dzisiejszeProdukty.forEach((prod, i) => {
+          const div = document.createElement("div");
+          Object.assign(div.style, {
+            marginBottom:    "1.5rem",
+            padding:         "1rem",
+            border:          "1px solid #ddd",
+            borderRadius:    "8px",
+            backgroundColor: "#fff",
+          });
+          div.innerHTML = `<strong>${i+1}. ${prod}</strong>`;
+          kontener.appendChild(div);
+        });
+
+      } catch(err) {
+        console.error("Błąd ładowania ogłoszeń:", err);
+        kontener.textContent = "Błąd ładowania danych.";
+      }
     }
-  }
 
-  document.querySelector('[data-tab="tab3"]')
-          .addEventListener("click", ladujDodaneDzis);
-</script>
+    // Podłącz loader do kliknięcia zakładki
+    document.querySelector('[data-tab="tab3"]')
+            .addEventListener("click", ladujDodaneDzis);
+  </script>
 </body>
 </html>
