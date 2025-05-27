@@ -157,7 +157,7 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
       .then(r => r.json())
       .then(data => {
         const params = new URLSearchParams(data).toString();
-        window.location.href = `ogloszenie.html?${params}`;
+        window.location.href = `ads1.html?${params}`;
       })
       .catch(err => {
         console.error('Błąd uploadu PDF:', err);
