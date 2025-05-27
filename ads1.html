@@ -55,15 +55,29 @@
 
 <div class="block">
   <label for="title">Tytuł ogłoszenia</label>
-  <textarea id="title" readonly></textarea>
+  <textarea id="title" readonly>Koparka kołowa – DOOSAN DX190W-3 – 2014 – 9261 mtg – sprawdzony</textarea>
   <button class="copy-btn" onclick="copyToClipboard('title')">Kliknij, aby skopiować</button>
 </div>
 
 <div class="block">
   <label for="body">Treść ogłoszenia</label>
-  <textarea id="body" readonly></textarea>
+  <textarea id="body" readonly>Koparka kołowa marki Doosan, model DX190W-3 z 2014 roku, z przebiegiem 9261 motogodzin, dostępna jest na sprzedaż. Maszyna posiada uszkodzenia eksploatacyjne oraz zacieki lakieru adekwatne do okresu użytkowania. Kabina wymaga uwagi ze względu na zniszczenia. Silnik uruchamia się prawidłowo, lecz sygnalizowana jest usterka. Opony na przednich kołach 85% bieżnika, tylne 70%. Pojazd nie przeszedł prób drogowych, a podwozie jest zanieczyszczone. Sprzedaż obejmuje pojazd w opisanym stanie rzeczywistym wraz z dokumentacją rzeczoznawcy, bez odpowiedzialności za ukryte wady.
+
+Przykładowe zastosowanie: Budownictwo drogowe, prace ziemne, budowa kanałów.
+
+– Rok produkcji: 2014
+– Przebieg / motogodziny: 9261 mtg
+– Typ / model: DOOSAN DX190W-3
+– Pojemność / Moc silnika: 1 ccm / 1kW (1KM)
+– VIN: DHKCEWAJLE5001080
+
+Wystawiamy fakturę VAT 23%. Do ogłoszenia dołączona jest opinia biegłego rzeczoznawcy, dostępna do bezpłatnego pobrania.
+
+Zapraszamy do kontaktu:
+maszyny@poleasingowe.pl | ☎ (71) 715 60 17</textarea>
   <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
 </div>
+
 <a href="upload.html" class="back-button">🔄 Generuj kolejne</a>
 
 <style>
@@ -83,31 +97,8 @@
   background-color: #2c278d;
 }
 </style>
+
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-
-  const mapping = {
-    title: "title",
-    body: "body",
-    specyfikacja: "spec",
-    zastosowanie: "use",
-    info: "info",
-    kontakt: "kontakt"
-  };
-
-  for (const key in mapping) {
-    const val = params.get(key);
-    if (val) {
-      const el = document.getElementById(mapping[key]);
-      if (el) {
-        el.value = val;
-        autoResizeTextarea(mapping[key]);
-      }
-    }
-  }
-});
-
 function copyToClipboard(id) {
   const textarea = document.getElementById(id);
   textarea.select();
@@ -125,14 +116,6 @@ function copyToClipboard(id) {
     }
   } catch (err) {
     alert("Nie udało się skopiować");
-  }
-}
-
-function autoResizeTextarea(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
   }
 }
 </script>
