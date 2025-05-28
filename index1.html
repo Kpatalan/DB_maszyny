@@ -195,17 +195,28 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
   const form = this;
   const formData = new FormData(form);
 
+  fetch(form.action, {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
   .then(data => {
-  const title = data.response?.body?.title || '';
-  const body = data.response?.body?.body || '';
+    const title = data.response?.body?.title || '';
+    const body = data.response?.body?.body || '';
 
-  const params = new URLSearchParams({
-    title: title,
-    body: body
-  }).toString();
+    const params = new URLSearchParams({
+      title: title,
+      body: body
+    }).toString();
 
-  window.location.href = `ogloszenie.html?${params}`;
+    window.location.href = `ogloszenie.html?${params}`;
+  })
+  .catch(error => {
+    console.error('Błąd przy wysyłce formularza:', error);
+    alert('Coś poszło nie tak przy wysyłce PDF.');
+  });
 });
+
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
