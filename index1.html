@@ -113,6 +113,18 @@
       z-index: 999;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
+#uploadForm button {
+  margin-top: 8px;
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+}
   </style>
 </head>
 <body>
@@ -129,13 +141,14 @@
     <div id="tab1" class="tab-content active">
       <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
       <form id="uploadForm">
-        <input type="file" name="file" accept="application/pdf" required />
-        <button type="submit" class="copy-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-          </svg> Wyślij PDF
-        </button>
-      </form>
+  <input type="file" name="file" accept="application/pdf" required />
+  <button type="submit">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+      <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
+    </svg>
+    Wyślij PDF
+  </button>
+</form>
     </div>
 
     <div id="tab2" class="tab-content">
