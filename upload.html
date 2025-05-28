@@ -6,229 +6,89 @@
   <title>Dashboard Poleasingowe.pl</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      padding: 40px;
-    }
-    h1 {
-      font-size: 36px;
-      font-weight: bold;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      padding: 2rem;
     }
     h2 {
-      font-size: 28px;
-      font-weight: normal;
-      color: #444;
+      margin-bottom: 1rem;
     }
-    .tabs {
-      margin-top: 20px;
-      display: flex;
-      gap: 24px;
-      font-size: 18px;
+    form {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .tab {
-      cursor: pointer;
-      color: #999;
-      border-bottom: 2px solid transparent;
-      padding-bottom: 8px;
+    input[type="file"] {
+      margin-bottom: 1rem;
     }
-    .tab.active {
-      color: #3730a3;
-      border-color: #3730a3;
-      font-weight: bold;
-    }
-    .tab-content {
-      display: none;
-      margin-top: 10px;
-      background-color: #f0f4ff;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .container {
-      margin-top: 20px;
-    }
-    #uploadForm {
-      margin-top: 15px;
-    }
-    #uploadForm input[type="file"] {
-      margin-bottom: 10px;
-    }
-    #uploadForm button {
-      display: flex;
-      align-items: center;
-      background-color: #3730a3;
+    button {
+      background-color: #1d3557;
       color: white;
       border: none;
-      padding: 10px 15px;
+      padding: 10px 16px;
       cursor: pointer;
       border-radius: 5px;
-    }
-    #uploadForm button svg {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-      fill: white;
-    }
-    #loadingSpinner {
-      display: none;
-      margin-left: 10px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
     }
     .spinner {
+      display: inline-block;
       width: 16px;
       height: 16px;
       border: 2px solid #ccc;
-      border-top: 2px solid #3730a3;
+      border-top: 2px solid #1d3557;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      margin-left: 10px;
     }
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <h1>Dashboard Poleasingowe.pl</h1>
-  <h2>Maszyny i urządzenia</h2>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="tab1">🗃️ Generator ogłoszeń</div>
-    <div class="tab" data-tab="tab2">Wylicytowane dziś</div>
-    <div class="tab" data-tab="tab3">Dodane dziś</div>
-  </div>
+  <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
 
-  <div id="tab1" class="tab-content active">
-<div class="container">
-  <h2>Wprowadź nazwę aukcji do generatora ogłoszeń</h2>
   <form
     id="uploadForm"
     action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
     method="post"
-    target="dummyFrame"
+    enctype="multipart/form-data"
   >
-    <input type="text" name="auctionName" placeholder="Wpisz nazwę aukcji" required />
+    <input type="file" name="data" accept="application/pdf" required />
     <button type="submit">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z"/>
-      </svg>
-      Wyślij nazwę
-      <div id="loadingSpinner">
-        <div class="spinner"></div>
-      </div>
+      Wyślij PDF
+      <span id="loadingSpinner" class="spinner" style="display: none;"></span>
     </button>
   </form>
-</div>
 
-  <div id="tab2" class="tab-content">
-    <p>Tutaj będą wylicytowane dzisiaj ogłoszenia.</p>
-  </div>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-  <div id="tab3" class="tab-content">
-    <h3>Ogłoszenia ze statusem NOWE:</h3>
-    <div id="dodane-dzis">Ładowanie danych...</div>
-  </div>
+      const formData = new FormData(this);
+      document.getElementById('loadingSpinner').style.display = 'inline-block';
 
-  <iframe name="dummyFrame" style="display:none;"></iframe>
-
-<script>
-/* -----------------------------  TABS  ----------------------------- */
-const tabs      = document.querySelectorAll('.tab');
-const contents  = document.querySelectorAll('.tab-content');
-
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs     .forEach(t => t.classList.remove('active'));
-    contents .forEach(c => c.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
-
-    /* Jeżeli kliknięto zakładkę „Dodane dziś”, ładujemy dane */
-    if (tab.dataset.tab === 'tab3') ladujDodaneDzis();
-  });
-});
-
-/* -----------------------  UPLOAD PDF FORM  ------------------------ */
-document.getElementById('uploadForm').addEventListener('submit', function (e) {
-  document.getElementById('loadingSpinner').style.display = 'inline-block';
-  setTimeout(() => {
-    fetch(this.action, { method: 'POST', body: new FormData(this) })
-      .then(r => r.json())
-      .then(data => {
-        const params = new URLSearchParams(data).toString();
-        window.location.href = `ads1.html?${params}`;
+      fetch(this.action, {
+        method: 'POST',
+        body: formData
       })
-      .catch(err => {
-        console.error('Błąd uploadu PDF:', err);
-        alert('Nie udało się wysłać PDF.');
-      });
-  }, 2500);
-  e.preventDefault();
-});
-
-/* ---------------------  ŁADOWANIE „DODANE”  ----------------------- */
-async function ladujDodaneDzis() {
-  const kontener = document.getElementById('dodane-dzis');
-  kontener.textContent = 'Ładuję…';
-
-  try {
-    const res   = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2', {
-      /**  W razie problemów CORS można aktywować:  mode: 'cors'  **/
+        .then(res => res.json())
+        .then(data => {
+          const title = data.title || '';
+          const body = data.body || '';
+          const params = new URLSearchParams({ title, body }).toString();
+          window.location.href = `ogloszenie.html?${params}`;
+        })
+        .catch(err => {
+          console.error('Błąd przesyłania PDF:', err);
+          alert('Nie udało się wygenerować ogłoszenia.');
+        });
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const wynik = await res.json();
-    console.log('Odebrana odpowiedź z webhooka:', wynik);   // <-- Debug
-
-    /*  Spróbuj znaleźć tablicę z wierszami w najczęstszych miejscach  */
-    const dane = Array.isArray(wynik)                 ? wynik
-               : Array.isArray(wynik.body)            ? wynik.body
-               : Array.isArray(wynik.data)            ? wynik.data
-               : Array.isArray(wynik.response?.body)  ? wynik.response.body
-               : [];
-
-    if (!Array.isArray(dane) || dane.length === 0) {
-      kontener.textContent = 'Brak danych lub niepoprawny format odpowiedzi.';
-      return;
-    }
-
-    /*  Wyciągnij wszystkie nie-puste „Produkty Nowe”  */
-    const produkty = dane
-      .map(r => (r['Produkty Nowe'] || '').trim())
-      .filter(txt => txt !== '');
-
-    if (produkty.length === 0) {
-      kontener.textContent = 'Brak dostępnych produktów.';
-      return;
-    }
-
-    /*  Renderuj listę  */
-    kontener.innerHTML = '';
-    produkty.forEach((prod, i) => {
-      const div = document.createElement('div');
-      Object.assign(div.style, {
-        marginBottom:    '1.5rem',
-        padding:         '1rem',
-        border:          '1px solid #ddd',
-        borderRadius:    '8px',
-        backgroundColor: '#fff',
-      });
-      div.innerHTML = `<strong>${i + 1}. ${prod}</strong>`;
-      kontener.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error('Błąd ładowania ogłoszeń:', err);
-    kontener.textContent = 'Błąd ładowania danych.';
-  }
-}
-
-/*  Gdyby zakładka „Dodane dziś” była aktywna już po załadowaniu strony  */
-if (document.querySelector('[data-tab="tab3"]').classList.contains('active')) {
-  ladujDodaneDzis();
-}
-</script>
+  </script>
 
 </body>
 </html>
