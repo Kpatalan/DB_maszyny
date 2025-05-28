@@ -2,85 +2,98 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ogłoszenie z PDF (Dane z webhooka n8n)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: sans-serif;
-      background: #f4f4f4;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #e6eef5, #f8fafc);
       padding: 2rem;
+      color: #202c3b;
+      max-width: 960px;
+      margin: 0 auto;
     }
     h1 {
       margin-bottom: 2rem;
+      font-size: 32px;
+      color: #202c3b;
+      text-transform: uppercase;
+      font-weight: 700;
+      text-align: center;
     }
     .block {
-      background: #fff;
-      padding: 1rem;
+      background: #ffffff;
+      padding: 1.5rem;
       margin-bottom: 2rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     label {
       display: block;
-      font-weight: bold;
+      font-weight: 600;
       margin-bottom: 0.5rem;
     }
     textarea {
       width: 100%;
       font-family: monospace;
       font-size: 1rem;
-      padding: 0.5rem;
-      border: 1px solid #aaa;
-      border-radius: 4px;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       background: #f9f9f9;
-      overflow-y: hidden;
       resize: none;
+      box-sizing: border-box;
     }
     button.copy-btn {
-      margin-top: 0.5rem;
-      padding: 6px 12px;
-      background: #0077cc;
+      margin-top: 0.75rem;
+      padding: 10px 16px;
+      background: linear-gradient(to right, #202c3b, #4a90e2);
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
     }
     button.copy-btn:hover {
-      background: #005fa3;
+      background: linear-gradient(to right, #1a2633, #3d7bc1);
     }
-    .back-button {
+    .nav-button {
       display: inline-block;
       margin-top: 2rem;
       padding: 10px 16px;
-      background-color: #3730a3;
-      color: white;
+      background: linear-gradient(to right, #1a2633, #3d7bc1);
+      color: #fff;
       text-decoration: none;
       border-radius: 6px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 500;
-      transition: background-color 0.2s ease;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .back-button:hover {
-      background-color: #2c278d;
+    .nav-button:hover {
+      background: linear-gradient(to right, #0e1823, #2c5a9c);
     }
   </style>
 </head>
 <body>
 
-<h1>Dane z webhooka (n8n)</h1>
+<h1>OGŁOSZENIE PORTAL (N8N)</h1>
 
 <div class="block">
   <label for="title">Tytuł ogłoszenia</label>
-  <textarea id="title" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('title')">Kliknij, aby skopiować</button>
+  <textarea id="title" rows="2" readonly></textarea>
+  <button class="copy-btn" onclick="copyToClipboard('title')">Skopiuj tytuł</button>
 </div>
 
 <div class="block">
   <label for="body">Treść ogłoszenia</label>
-  <textarea id="body" readonly></textarea>
-  <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
+  <textarea id="body" rows="10" readonly></textarea>
+  <button class="copy-btn" onclick="copyToClipboard('body')">Skopiuj treść</button>
 </div>
 
-<a href="index.html" class="back-button">🔄 Generuj kolejne</a>
+<a href="index1.html" class="nav-button">⬅️ Powrót do panelu</a>
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
@@ -95,7 +108,7 @@ window.addEventListener("DOMContentLoaded", () => {
 function copyToClipboard(id) {
   const textarea = document.getElementById(id);
   textarea.select();
-  textarea.setSelectionRange(0, 99999); // iOS fix
+  textarea.setSelectionRange(0, 99999);
 
   try {
     const copied = document.execCommand("copy");
