@@ -84,30 +84,17 @@
 }
 </style>
 <script>
-window.addEventListener("DOMContentLoaded", () => {
+indow.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   document.getElementById("title").value = params.get("title") || "";
   document.getElementById("body").value = params.get("body") || "";
 });
 
-
-  for (const key in mapping) {
-    const val = params.get(key);
-    if (val) {
-      const el = document.getElementById(mapping[key]);
-      if (el) {
-        el.value = val;
-        autoResizeTextarea(mapping[key]);
-      }
-    }
-  }
-});
-
 function copyToClipboard(id) {
   const textarea = document.getElementById(id);
   textarea.select();
-  textarea.setSelectionRange(0, 99999); // iOS fix
-
+  document.execCommand("copy");
+}
   try {
     const copied = document.execCommand("copy");
     const button = textarea.nextElementSibling;
