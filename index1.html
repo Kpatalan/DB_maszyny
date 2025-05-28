@@ -139,13 +139,20 @@
     <div class="header">Dashboard 📈</div>
 
     <div id="tab1" class="tab-content active">
-      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
-      <form id="uploadForm">
+     <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
+      <form
+        id="uploadForm"
+        action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+        method="post"
+        enctype="multipart/form-data"
+        target="dummyFrame"
+      >
         <input type="file" name="file" accept="application/pdf" required />
         <button type="submit">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
             <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
           </svg> Wyślij PDF
+          <div id="loadingSpinner"><div class="spinner"></div></div>
         </button>
       </form>
     </div>
