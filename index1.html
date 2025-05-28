@@ -1,94 +1,838 @@
-<!DOCTYPE html>
+
+
 <html lang="pl">
+
 <head>
+
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Dashboard Poleasingowe.pl</title>
+
   <style>
+
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
+
       font-family: 'Segoe UI', sans-serif;
+
       background-color: #f4f6f8;
-      padding: 2rem;
+
+
+      display: flex;
+
+
+      min-height: 100vh;
+
     }
-    h2 {
-      margin-bottom: 1rem;
-    }
-    form {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    input[type="file"] {
-      margin-bottom: 1rem;
-    }
-    button {
+
+
+    .sidebar {
+
+
+      width: 240px;
+
+
       background-color: #1d3557;
+
+
       color: white;
-      border: none;
-      padding: 10px 16px;
+
+
+      display: flex;
+
+
+      flex-direction: column;
+
+
+      padding-top: 20px;
+
+
+    }
+
+
+    .sidebar h2 {
+
+
+      text-align: center;
+
+
+      margin-bottom: 30px;
+
+
+      font-size: 20px;
+
+
+      color: #f1faee;
+
+
+    }
+
+
+    .sidebar a {
+
+
+      color: #a8dadc;
+
+
+      text-decoration: none;
+
+
+      padding: 12px 20px;
+
+
+      display: block;
+
+
+      transition: background 0.3s;
+
+
       cursor: pointer;
-      border-radius: 5px;
-      font-size: 16px;
-      display: inline-flex;
+
+
+    }
+
+
+    .sidebar a:hover, .sidebar a.active {
+
+
+      background-color: #457b9d;
+
+
+      font-weight: bold;
+
+
+      color: #ffffff;
+
+    }
+
+
+    .main {
+
+
+      flex: 1;
+
+
+      display: flex;
+
+
+      flex-direction: column;
+
+
+    }
+
+
+    .header {
+
+
+      background-color: #1d3557;
+
+
+      color: white;
+
+
+      padding: 16px 24px;
+
+
+      font-size: 22px;
+
+
+    }
+
+
+    .tab-content {
+
+
+      display: none;
+
+
+      padding: 24px;
+
+
+      background-color: #ffffff;
+
+
+      flex: 1;
+
+
+      overflow-y: auto;
+
+
+    }
+
+
+    .tab-content.active {
+
+
+      display: block;
+
+
+    }
+
+
+    table {
+
+
+      width: 50%;
+
+
+      border-collapse: collapse;
+
+      background: #fff;
+
+
+      margin-left: 0;
+
+
+
+    }
+
+
+    th, td {
+
+
+      border: 1px solid #ccc;
+
+
+      padding: 8px;
+
+
+      text-align: left;
+
+
+      vertical-align: top;
+
+    }
+
+
+    .kopia-wiersza {
+
+
+      position: relative;
+
+
+      padding-right: 80px;
+
+
+    }
+
+
+    .copy-btn {
+
+
+      display: flex;
+
+
       align-items: center;
+
+
+      background-color: #1d3557;
+
+
+      color: white;
+
+
+      border: none;
+
+
+      padding: 6px 10px;
+
+
+      cursor: pointer;
+
+
+      border-radius: 5px;
+
+
+      font-size: 14px;
+
+
+      position: absolute;
+
+
+      right: 8px;
+
+
+      top: 50%;
+
+
+      transform: translateY(-50%);
+
+
     }
-    .spinner {
-      display: inline-block;
+
+
+    .copy-btn svg {
+
+
+      margin-right: 4px;
+
+
+      fill: white;
+
+
       width: 16px;
+
+
       height: 16px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #1d3557;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 10px;
+
+
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+
+
+    .copy-btn:hover {
+
+
+      background-color: #457b9d;
+
+
     }
+
+
+    #toast {
+
+
+      position: fixed;
+
+
+      bottom: 24px;
+
+
+      left: 24px;
+
+
+      background-color: #1d3557;
+
+
+      color: #fff;
+
+
+      padding: 12px 20px;
+
+
+      border-radius: 6px;
+
+
+      font-size: 14px;
+
+
+      display: none;
+
+
+      z-index: 999;
+
+
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+
+
+    }
+
+
+    #uploadForm button {
+
+
+      margin-top: 8px;
+
+      background-color: #1d3557;
+
+      color: white;
+
+      border: none;
+
+@@ -125,188 +33,62 @@
+
+      display: inline-flex;
+
+      align-items: center;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   </style>
+
 </head>
+
 <body>
 
-  <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
 
-  <form
-    id="uploadForm"
-    action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
-    method="post"
-    enctype="multipart/form-data"
-  >
-    <input type="file" name="data" accept="application/pdf" required />
-    <button type="submit">
-      Wyślij PDF
-      <span id="loadingSpinner" class="spinner" style="display: none;"></span>
-    </button>
-  </form>
+  <div class="sidebar">
+
+
+    <h2>MACHINERY BOX</h2>
+
+
+    <a class="tab-link active" data-tab="tab1">🗃️ Generator ogłoszeń</a>
+
+
+    <a class="tab-link" data-tab="tab2">📈 Wylicytowane dziś</a>
+
+
+    <a class="tab-link" data-tab="tab3">🆕 Dodane dziś</a>
+
+
+  </div>
+
+
+
+
+
+  <div class="main">
+
+
+    <div class="header">Dashboard 📈</div>
+
+
+
+
+
+    <div id="tab1" class="tab-content active">
+
+
+     <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
+
+
+
+
+<form
+  id="uploadForm"
+  action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+  method="post"
+  enctype="multipart/form-data"
+>
+  <input type="file" name="data" accept="application/pdf" required />
+  <button type="submit">Wyślij PDF</button>
+    </div>
+    <div id="tab2" class="tab-content">
+
+
+      <table>
+
+
+        <thead>
+
+
+          <tr>
+
+
+            <th>Kod produktu</th>
+
+
+            <th>Kod aukcji</th>
+
+
+            <th>Tytuł aukcji</th>
+
+
+            <th>Zwycięzca aukcji</th>
+
+
+            <th>Cena wywoławcza</th>
+
+
+            <th>Aktualna cena</th>
+
+
+          </tr>
+
+
+        </thead>
+
+
+        <tbody id="wylicytowaneTabela">
+
+
+          <tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+
+
+
+
+
+    <div id="tab3" class="tab-content">
+
+
+      <h3>Ogłoszenia ze statusem NOWE:</h3>
+
+
+      <button id="filtrujBtn" style="margin-bottom: 12px;">
+
+
+        Sortowanie: wyłączone
+
+
+      </button>
+
+
+      <table>
+
+
+        <thead><tr><th>Opis produktu</th></tr></thead>
+
+
+        <tbody id="dodaneTabela">
+
+
+          <tr><td style="text-align:center;">Ładowanie danych…</td></tr>
+
+
+        </tbody>
+
+
+      </table>
+
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+  <div id="toast">Skopiowano do schowka ✅</div>
+
+
 
   <script>
-    document.getElementById('uploadForm').addEventListener('submit', function (e) {
-      e.preventDefault();
 
-      const formData = new FormData(this);
+
+    let sortowanieAktywne = false;
+
+
+
+
+
+     // Upload pliku
+
+
+document.getElementById('uploadForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  fetch(this.action, {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      const title = data.response?.body?.title || '';
+      const body = data.response?.body?.body || '';
+
+      const params = new URLSearchParams({
+        title,
+        body
+      }).toString();
+
+      window.location.href = `ogloszenie.html?${params}`;
+    })
+    .catch(err => {
+      console.error('Błąd przesyłania PDF:', err);
+      alert('Nie udało się wygenerować ogłoszenia.');
+    });
+});
+    function pokazToast() {
+
+
+      const toast = document.getElementById('toast');
+
+
+      toast.style.display = 'block';
+
+
+      setTimeout(() => { toast.style.display = 'none'; }, 2000);
+
+
+    }
+
+
+
+
+
+    function czyDrugaLiteraDuza(tekst) {
+
+
+      const pierwszeSlowo = tekst.trim().split(' ')[0];
+
+
+      return pierwszeSlowo.length > 1 && pierwszeSlowo[1] === pierwszeSlowo[1].toUpperCase();
+
+
+    }
+
+
+
+
+    document.querySelectorAll('.tab-link').forEach(link => {
+
+
+      link.addEventListener('click', () => {
+
+
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+
+
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+
+        link.classList.add('active');
+
+
+        document.getElementById(link.dataset.tab).classList.add('active');
+
+
+        if (link.dataset.tab === 'tab2') ladujWylicytowane();
+
+
+        if (link.dataset.tab === 'tab3') ladujDodaneDzis(sortowanieAktywne);
+
+
+      });
+
+
+    });
+
+
+
+
+
+    document.getElementById('filtrujBtn').addEventListener('click', () => {
+
+
+      sortowanieAktywne = !sortowanieAktywne;
+
+
+      document.getElementById('filtrujBtn').innerText =
+
+
+        `Sortowanie: ${sortowanieAktywne ? 'włączone' : 'wyłączone'}`;
+
+
+      ladujDodaneDzis(sortowanieAktywne);
+
+
+    });
+
+
+
+
+
+    async function ladujWylicytowane() {
+
+
+      const tabela = document.getElementById('wylicytowaneTabela');
+
+
+      tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>`;
+
+
+      try {
+
+
+        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/3f1a9037-34f4-4f70-a1da-974e230e45c7');
+
+
+        const dane = await res.json();
+
+
+        tabela.innerHTML = '';
+
+
+        dane.forEach(item => {
+
+
+          const row = document.createElement('tr');
+
+
+          row.innerHTML = `
+
+
+            <td>${item["Kod produktu"] || '-'}</td>
+
+
+            <td>${item["Kod aukcji"] || '-'}</td>
+
+
+            <td>${item["Tytuł aukcji"] || '-'}</td>
+
+
+            <td>${item["Zwycięca aukcji"] || '-'}</td>
+
+
+            <td>${item["Cena wywoławcza"] || '-'}</td>
+
+
+            <td>${item["Aktualna cena"] || '-'}</td>`;
+
+
+          tabela.appendChild(row);
+
+
+        });
+
+
+      } catch (e) {
+
+
+        tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Błąd ładowania danych</td></tr>`;
+
+
+      }
+
+
+    }
+
+
+
+
+
+    async function ladujDodaneDzis(filtruj = false) {
+
+
+      const tabela = document.getElementById('dodaneTabela');
+
+
+      tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
+
+
+      try {
+
+
+        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
+
+
+        const wynik = await res.json();
+
+
+        const dane = Array.isArray(wynik) ? wynik :
+
+
+                     Array.isArray(wynik.body) ? wynik.body :
+
+
+                     Array.isArray(wynik.data) ? wynik.data : [];
+
+
+
+
+
+        tabela.innerHTML = '';
+
+
+        let items = dane.filter(item => item["Produkty Nowe"]);
+
+
+
+
+
+        if (filtruj) {
+
+
+          items = items.sort((a, b) => {
+
+
+            const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
+
+
+            const bMatch = czyDrugaLiteraDuza(b["Produkty Nowe"]) ? 0 : 1;
+
+
+            return aMatch - bMatch;
+
+
+          });
+
+
+        }
+
+
+
+
+        items.forEach(item => {
+
+
+          const tekst = item["Produkty Nowe"];
+
+
+          const row = document.createElement('tr');
+
+
+          row.innerHTML = `<td class="kopia-wiersza">${tekst}
+
+
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`).then(pokazToast)">
+
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+
+
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+
+
+              </svg> Kopiuj
+
+
+            </button></td>`;
+
+
+          tabela.appendChild(row);
+
+
+
+
+
+        });
+
+
+      } catch (e) {
+
+
+        tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych</td></tr>`;
+
+
+      }
+
+
+    }
+
+
+
+
+
+    document.getElementById('uploadForm').addEventListener('submit', function () {
+
+
       document.getElementById('loadingSpinner').style.display = 'inline-block';
 
-      fetch(this.action, {
-        method: 'POST',
-        body: formData
-      })
-        .then(res => res.json())
-        .then(data => {
-          const title = data.title || '';
-          const body = data.body || '';
-          const params = new URLSearchParams({ title, body }).toString();
-          window.location.href = `ogloszenie.html?${params}`;
-        })
-        .catch(err => {
-          console.error('Błąd przesyłania PDF:', err);
-          alert('Nie udało się wygenerować ogłoszenia.');
-        });
     });
+
   </script>
 
+
 </body>
+
 </html>
