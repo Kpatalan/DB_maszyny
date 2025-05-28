@@ -210,10 +210,16 @@
     let sortowanieAktywne = false;
 
     function onUploadComplete() {
-      document.getElementById('loadingSpinner').style.display = 'none';
-      window.location.href = "https://kpatalan.github.io/DB_maszyny/ogloszenie.html";
-    }
+    if (!czyFormularzWyslany) return;
 
+    document.getElementById('loadingSpinner').style.display = 'none';
+    window.location.href = "https://kpatalan.github.io/DB_maszyny/ogloszenie.html";
+  }
+
+  document.getElementById('uploadForm').addEventListener('submit', function () {
+    czyFormularzWyslany = true;
+    document.getElementById('loadingSpinner').style.display = 'inline-block';
+  });
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
