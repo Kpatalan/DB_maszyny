@@ -113,18 +113,18 @@
       z-index: 999;
       box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-#uploadForm button {
-  margin-top: 8px;
-  background-color: #1d3557;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-}
+    #uploadForm button {
+      margin-top: 8px;
+      background-color: #1d3557;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -141,14 +141,13 @@
     <div id="tab1" class="tab-content active">
       <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
       <form id="uploadForm">
-  <input type="file" name="file" accept="application/pdf" required />
-  <button type="submit">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-      <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-    </svg>
-    Wyślij PDF
-  </button>
-</form>
+        <input type="file" name="file" accept="application/pdf" required />
+        <button type="submit">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
+          </svg> Wyślij PDF
+        </button>
+      </form>
     </div>
 
     <div id="tab2" class="tab-content">
@@ -171,6 +170,9 @@
 
     <div id="tab3" class="tab-content">
       <h3>Ogłoszenia ze statusem NOWE:</h3>
+      <button id="filtrujBtn" style="margin-bottom: 12px;">
+        Sortowanie: wyłączone
+      </button>
       <table>
         <thead><tr><th>Opis produktu</th></tr></thead>
         <tbody id="dodaneTabela">
@@ -183,6 +185,8 @@
   <div id="toast">Skopiowano do schowka ✅</div>
 
   <script>
+    let sortowanieAktywne = false;
+
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
@@ -201,8 +205,15 @@
         link.classList.add('active');
         document.getElementById(link.dataset.tab).classList.add('active');
         if (link.dataset.tab === 'tab2') ladujWylicytowane();
-        if (link.dataset.tab === 'tab3') ladujDodaneDzis();
+        if (link.dataset.tab === 'tab3') ladujDodaneDzis(sortowanieAktywne);
       });
+    });
+
+    document.getElementById('filtrujBtn').addEventListener('click', () => {
+      sortowanieAktywne = !sortowanieAktywne;
+      document.getElementById('filtrujBtn').innerText = 
+        `Sortowanie: ${sortowanieAktywne ? 'włączone' : 'wyłączone'}`;
+      ladujDodaneDzis(sortowanieAktywne);
     });
 
     async function ladujWylicytowane() {
@@ -228,7 +239,7 @@
       }
     }
 
-    async function ladujDodaneDzis() {
+    async function ladujDodaneDzis(filtruj = false) {
       const tabela = document.getElementById('dodaneTabela');
       tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
       try {
@@ -239,23 +250,27 @@
                      Array.isArray(wynik.data) ? wynik.data : [];
 
         tabela.innerHTML = '';
-        dane.filter(item => item["Produkty Nowe"])
-            .sort((a, b) => {
-              const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
-              const bMatch = czyDrugaLiteraDuza(b["Produkty Nowe"]) ? 0 : 1;
-              return aMatch - bMatch;
-            })
-            .forEach(item => {
-              const tekst = item["Produkty Nowe"];
-              const row = document.createElement('tr');
-              row.innerHTML = `<td class="kopia-wiersza">${tekst}
-                <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`).then(pokazToast)">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
-                  </svg> Kopiuj
-                </button></td>`;
-              tabela.appendChild(row);
-            });
+        let items = dane.filter(item => item["Produkty Nowe"]);
+
+        if (filtruj) {
+          items = items.sort((a, b) => {
+            const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
+            const bMatch = czyDrugaLiteraDuza(b["Produkty Nowe"]) ? 0 : 1;
+            return aMatch - bMatch;
+          });
+        }
+
+        items.forEach(item => {
+          const tekst = item["Produkty Nowe"];
+          const row = document.createElement('tr');
+          row.innerHTML = `<td class="kopia-wiersza">${tekst}
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`).then(pokazToast)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+              </svg> Kopiuj
+            </button></td>`;
+          tabela.appendChild(row);
+        });
       } catch (e) {
         tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych</td></tr>`;
       }
