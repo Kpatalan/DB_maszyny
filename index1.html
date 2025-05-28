@@ -195,19 +195,16 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
   const form = this;
   const formData = new FormData(form);
 
-  fetch(form.action, {
-    method: 'POST',
-    body: formData
-  })
-    .then(res => res.json()) // lub .text() jeśli webhook nie zwraca JSON-a
-    .then(data => {
-      // Opcjonalnie: przetwórz odpowiedź i przekaż dane do strony ogłoszenia
-      window.location.href = `ogloszenie.html?title=${encodeURIComponent(data.tytul)}&body=${encodeURIComponent(data.tresc)}`;
-    })
-    .catch(err => {
-      console.error('Błąd uploadu PDF:', err);
-      alert('Nie udało się wysłać PDF.');
-    });
+  .then(data => {
+  const title = data.response?.body?.title || '';
+  const body = data.response?.body?.body || '';
+
+  const params = new URLSearchParams({
+    title: title,
+    body: body
+  }).toString();
+
+  window.location.href = `ogloszenie.html?${params}`;
 });
     function pokazToast() {
       const toast = document.getElementById('toast');
