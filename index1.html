@@ -81,17 +81,27 @@
     }
 
     .copy-btn {
-      background-color: #457b9d;
-      border: none;
+      display: flex;
+      align-items: center;
+      background-color: #1d3557;
       color: white;
-      padding: 6px 12px;
+      border: none;
+      padding: 8px 12px;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 5px;
       font-size: 14px;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .copy-btn svg {
+      margin-right: 6px;
+      fill: white;
+      width: 16px;
+      height: 16px;
     }
 
     .copy-btn:hover {
-      background-color: #1d3557;
+      background-color: #457b9d;
     }
 
     #uploadForm {
@@ -149,169 +159,4 @@
     <a class="tab-link" data-tab="tab3">🆕 Dodane dziś</a>
   </div>
 
-  <div class="main">
-    <div class="header">Dashboard 📈</div>
-
-    <div id="tab1" class="tab-content active">
-      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
-      <form id="uploadForm" action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e" method="post" enctype="multipart/form-data" target="dummyFrame">
-        <input type="file" name="file" accept="application/pdf" required />
-        <button type="submit">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-          </svg>
-          Wyślij PDF
-          <div id="loadingSpinner"><div class="spinner"></div></div>
-        </button>
-      </form>
-    </div>
-
-    <div id="tab2" class="tab-content">
-      <table id="wylicytowaneTabela" class="tabela-polowa" border="1" cellpadding="8" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Kod produktu</th>
-            <th>Kod aukcji</th>
-            <th>Tytuł aukcji</th>
-            <th>Zwycięzca aukcji</th>
-            <th>Cena wywoławcza</th>
-            <th>Aktualna cena</th>
-            <th>Kopiuj</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="7" style="text-align:center;">Ładowanie danych…</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div id="tab3" class="tab-content">
-      <h3>Ogłoszenia ze statusem NOWE:</h3>
-      <table id="dodaneTabela" class="tabela-polowa" border="1" cellpadding="8" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Opis produktu</th>
-            <th>Kopiuj</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <iframe name="dummyFrame" style="display:none;"></iframe>
-  </div>
-
-  <script>
-    const tabLinks = document.querySelectorAll('.tab-link');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        tabLinks.forEach(l => l.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        link.classList.add('active');
-        document.getElementById(link.dataset.tab).classList.add('active');
-
-        if (link.dataset.tab === 'tab3') ladujDodaneDzis();
-        if (link.dataset.tab === 'tab2') ladujWylicytowane();
-      });
-    });
-
-    document.getElementById('uploadForm').addEventListener('submit', function (e) {
-      document.getElementById('loadingSpinner').style.display = 'inline-block';
-      setTimeout(() => {
-        fetch(this.action, { method: 'POST', body: new FormData(this) })
-          .then(r => r.json())
-          .then(data => {
-            const params = new URLSearchParams(data).toString();
-            window.location.href = `ogloszenie.html?${params}`;
-          })
-          .catch(err => {
-            console.error('Błąd uploadu PDF:', err);
-            alert('Nie udało się wysłać PDF.');
-          });
-      }, 2500);
-      e.preventDefault();
-    });
-
-    async function ladujWylicytowane() {
-      const tabela = document.querySelector('#wylicytowaneTabela tbody');
-      tabela.innerHTML = `<tr><td colspan="7" style="text-align:center;">Ładowanie danych…</td></tr>`;
-
-      try {
-        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/3f1a9037-34f4-4f70-a1da-974e230e45c7');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const dane = await res.json();
-
-        tabela.innerHTML = '';
-        dane.forEach(item => {
-          const text = [
-            item["Kod produktu"],
-            item["Kod aukcji"],
-            item["Tytuł aukcji"],
-            item["Zwycięca aukcji"],
-            item["Cena wywoławcza"],
-            item["Aktualna cena"]
-          ].map(v => v || '-').join(' | ');
-
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${item["Kod produktu"] || '-'}</td>
-            <td>${item["Kod aukcji"] || '-'}</td>
-            <td>${item["Tytuł aukcji"] || '-'}</td>
-            <td>${item["Zwycięca aukcji"] || '-'}</td>
-            <td>${item["Cena wywoławcza"] || '-'}</td>
-            <td>${item["Aktualna cena"] || '-'}</td>
-            <td><button class="copy-btn" onclick="navigator.clipboard.writeText(\`${text}\`)">📋</button></td>
-          `;
-          tabela.appendChild(row);
-        });
-
-      } catch (err) {
-        console.error('Błąd ładowania wylicytowanych:', err);
-        tabela.innerHTML = `<tr><td colspan="7" style="text-align:center;">Błąd ładowania danych.</td></tr>`;
-      }
-    }
-
-    async function ladujDodaneDzis() {
-      const tabela = document.querySelector('#dodaneTabela tbody');
-      tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>`;
-
-      try {
-        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const wynik = await res.json();
-        const dane = Array.isArray(wynik) ? wynik
-                    : Array.isArray(wynik.body) ? wynik.body
-                    : Array.isArray(wynik.data) ? wynik.data
-                    : Array.isArray(wynik.response?.body) ? wynik.response.body
-                    : [];
-
-        tabela.innerHTML = '';
-        dane.forEach(item => {
-          const tekst = item["Produkty Nowe"];
-          if (!tekst) return;
-
-          const row = document.createElement('tr');
-          row.innerHTML = `<td>${tekst}</td><td><button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`)">📋</button></td>`;
-          tabela.appendChild(row);
-        });
-
-      } catch (err) {
-        console.error('Błąd ładowania dodanych:', err);
-        tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Błąd ładowania danych.</td></tr>`;
-      }
-    }
-
-    // Auto-load
-    if (document.querySelector('[data-tab="tab2"]').classList.contains('active')) {
-      ladujWylicytowane();
-    }
-    if (document.querySelector('[data-tab="tab3"]').classList.contains('active')) {
-      ladujDodaneDzis();
-    }
-  </script>
-</body>
-</html>
+  <d
