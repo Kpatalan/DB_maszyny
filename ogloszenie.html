@@ -86,15 +86,10 @@
 <script>
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
+  document.getElementById("title").value = params.get("title") || "";
+  document.getElementById("body").value = params.get("body") || "";
+});
 
-  const mapping = {
-    title: "title",
-    body: "body",
-    specyfikacja: "spec",
-    zastosowanie: "use",
-    info: "info",
-    kontakt: "kontakt"
-  };
 
   for (const key in mapping) {
     const val = params.get(key);
