@@ -142,19 +142,14 @@
      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
 
       <form
-
-        id="uploadForm"
-
-        action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
-
-        method="post"
-
-        enctype="multipart/form-data"
-
-        target="dummyFrame"
-
-      >
-
+  id="uploadForm"
+  action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+  method="post"
+  enctype="multipart/form-data"
+>
+  <input type="file" name="data" accept="application/pdf" required />
+  <button type="submit">Wyślij PDF</button>
+</form>
         <input type="file" name="data" accept="application/pdf" required />
 
         <button type="submit">
@@ -211,39 +206,26 @@
     let sortowanieAktywne = false;
 
      // Upload pliku
+document.getElementById('uploadForm').addEventListener('submit', function (e) {
+  e.preventDefault();
 
-    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+  const form = this;
+  const formData = new FormData(form);
 
-      document.getElementById('loadingSpinner').style.display = 'inline-block';
-
-      setTimeout(() => {
-
-        fetch(this.action, { method: 'POST', body: new FormData(this) })
-
-          .then(r => r.json())
-
-          .then(data => {
-
-            const params = new URLSearchParams(data).toString();
-
-            window.location.href = `ogloszenie.html?${params}`;
-
-          })
-
-          .catch(err => {
-
-            console.error('Błąd uploadu PDF:', err);
-
-            alert('Nie udało się wysłać PDF.');
-
-          });
-
-      }, 2500);
-
-      e.preventDefault();
-
+  fetch(form.action, {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json()) // lub .text() jeśli webhook nie zwraca JSON-a
+    .then(data => {
+      // Opcjonalnie: przetwórz odpowiedź i przekaż dane do strony ogłoszenia
+      window.location.href = `ogloszenie.html`;
+    })
+    .catch(err => {
+      console.error('Błąd uploadu PDF:', err);
+      alert('Nie udało się wysłać PDF.');
     });
-
+});
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
