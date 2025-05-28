@@ -149,23 +149,6 @@
 >
   <input type="file" name="data" accept="application/pdf" required />
   <button type="submit">Wyślij PDF</button>
-</form>
-        <input type="file" name="data" accept="application/pdf" required />
-
-        <button type="submit">
-
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-
-            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-
-          </svg>
-
-          Wyślij PDF
-
-        </button>
-
-      </form>
-
     </div>
 
     <div id="tab2" class="tab-content">
@@ -219,7 +202,7 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
     .then(res => res.json()) // lub .text() jeśli webhook nie zwraca JSON-a
     .then(data => {
       // Opcjonalnie: przetwórz odpowiedź i przekaż dane do strony ogłoszenia
-      window.location.href = `ogloszenie.html`;
+      window.location.href = `ogloszenie.html?title=${encodeURIComponent(data.tytul)}&body=${encodeURIComponent(data.tresc)}`;
     })
     .catch(err => {
       console.error('Błąd uploadu PDF:', err);
