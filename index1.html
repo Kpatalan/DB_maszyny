@@ -192,28 +192,23 @@
 document.getElementById('uploadForm').addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const form = this;
-  const formData = new FormData(form);
+  const formData = new FormData(this);
 
-  fetch(form.action, {
+  fetch(this.action, {
     method: 'POST',
     body: formData
   })
-  .then(response => response.json())
+  .then(res => res.json())
   .then(data => {
-    const title = data.response?.body?.title || '';
-    const body = data.response?.body?.body || '';
+    const title = data.title || '';
+    const body = data.body || '';
 
-    const params = new URLSearchParams({
-      title: title,
-      body: body
-    }).toString();
-
+    const params = new URLSearchParams({ title, body }).toString();
     window.location.href = `ogloszenie.html?${params}`;
   })
-  .catch(error => {
-    console.error('Błąd przy wysyłce formularza:', error);
-    alert('Coś poszło nie tak przy wysyłce PDF.');
+  .catch(err => {
+    console.error('Błąd przesyłania PDF:', err);
+    alert('Coś poszło nie tak!');
   });
 });
 
