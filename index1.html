@@ -198,20 +198,23 @@ document.getElementById('uploadForm').addEventListener('submit', function (e) {
     method: 'POST',
     body: formData
   })
-  .then(res => res.json())
-  .then(data => {
-    const title = data.title || '';
-    const body = data.body || '';
+    .then(res => res.json())
+    .then(data => {
+      const title = data.response?.body?.title || '';
+      const body = data.response?.body?.body || '';
 
-    const params = new URLSearchParams({ title, body }).toString();
-    window.location.href = `ogloszenie.html?${params}`;
-  })
-  .catch(err => {
-    console.error('Błąd przesyłania PDF:', err);
-    alert('Coś poszło nie tak!');
-  });
+      const params = new URLSearchParams({
+        title,
+        body
+      }).toString();
+
+      window.location.href = `ogloszenie.html?${params}`;
+    })
+    .catch(err => {
+      console.error('Błąd przesyłania PDF:', err);
+      alert('Nie udało się wygenerować ogłoszenia.');
+    });
 });
-
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
