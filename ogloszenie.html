@@ -47,6 +47,21 @@
     button.copy-btn:hover {
       background: #005fa3;
     }
+    .back-button {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 10px 16px;
+      background-color: #3730a3;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+    .back-button:hover {
+      background-color: #2c278d;
+    }
   </style>
 </head>
 <body>
@@ -64,37 +79,24 @@
   <textarea id="body" readonly></textarea>
   <button class="copy-btn" onclick="copyToClipboard('body')">Kliknij, aby skopiować</button>
 </div>
-<a href="upload.html" class="back-button">🔄 Generuj kolejne</a>
 
-<style>
-.back-button {
-  display: inline-block;
-  margin-top: 2rem;
-  padding: 10px 16px;
-  background-color: #3730a3;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-.back-button:hover {
-  background-color: #2c278d;
-}
-</style>
+<a href="index.html" class="back-button">🔄 Generuj kolejne</a>
+
 <script>
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
-  document.getElementById("title").value = params.get("title") || "";
-  document.getElementById("body").value = params.get("body") || "";
+  const title = params.get("title");
+  const body = params.get("body");
+
+  if (title !== null) document.getElementById("title").value = title;
+  if (body !== null) document.getElementById("body").value = body;
 });
 
 function copyToClipboard(id) {
   const textarea = document.getElementById(id);
   textarea.select();
-  document.execCommand("copy");
-}
+  textarea.setSelectionRange(0, 99999); // iOS fix
+
   try {
     const copied = document.execCommand("copy");
     const button = textarea.nextElementSibling;
@@ -107,14 +109,6 @@ function copyToClipboard(id) {
     }
   } catch (err) {
     alert("Nie udało się skopiować");
-  }
-}
-
-function autoResizeTextarea(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
   }
 }
 </script>
