@@ -169,7 +169,7 @@
           <span id="loadingSpinner" class="spinner" style="display: none;"></span>
         </button>
       </form>
-      <iframe name="dummyFrame" style="display:none;"></iframe>
+      <iframe name="dummyFrame" style="display:none;" onload="onUploadComplete()"></iframe>
     </div>
 
     <div id="tab2" class="tab-content">
@@ -208,6 +208,11 @@
 
   <script>
     let sortowanieAktywne = false;
+
+    function onUploadComplete() {
+      document.getElementById('loadingSpinner').style.display = 'none';
+      window.location.href = "https://kpatalan.github.io/DB_maszyny/ogloszenie.html";
+    }
 
     function pokazToast() {
       const toast = document.getElementById('toast');
