@@ -48,6 +48,26 @@
       font-weight: bold;
       color: #ffffff;
     }
+    .sidebar .crm-pill {
+      background: #f44336;
+      color: #fff;
+      border-radius: 24px;
+      padding: 6px 18px 6px 18px;
+      margin: 12px 24px 0 24px;
+      font-size: 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 1px 6px rgba(244,67,54,0.14);
+    }
+    .sidebar .crm-pill:hover, .sidebar .crm-pill.active {
+      background: #c62828;
+    }
     .main {
       flex: 1;
       display: flex;
@@ -158,9 +178,8 @@
     <a class="tab-link" href="upload.html"><i class="fas fa-file-alt"></i> Generator ogłoszeń</a>
     <a class="tab-link" data-tab="tab2"><i class="fas fa-chart-bar"></i> Wylicytowane dziś</a>
     <a class="tab-link" data-tab="tab3"><i class="fas fa-inbox"></i> Dodane dziś</a>
-    
-    
-    
+    <a class="tab-link" data-tab="tab4"><i class="fas fa-lightbulb"></i> Rekomendacje</a>
+    <div class="crm-pill tab-link" data-tab="tab5"><i class="fas fa-database"></i>&nbsp;CRM</div>
   </div>
   <div class="main">
     <div class="header">Dashboard <i class="fas fa-chart-line"></i></div>
@@ -192,42 +211,45 @@
         </tbody>
       </table>
     </div>
+    <div id="tab4" class="tab-content">
+      <h3>Rekomendacje AI dla sprzedaży</h3>
+      <p style="font-size:17px;color:#202c3b;">Tu pojawią się rekomendacje dotyczące leadów, aukcji lub potencjalnych okazji dla zespołu handlowego. Integracja z AI – rekomendacje generowane na podstawie danych sprzedażowych i historii klientów.</p>
+    </div>
+    <div id="tab5" class="tab-content">
+      <h3>CRM (system)</h3>
+      <p style="font-size:17px;color:#b71c1c;">Moduł CRM w trakcie wdrożenia.<br>Docelowo: pełna historia kontaktów, szybkie notatki, integracja z aukcjami i leadami, alerty i szybkie wyszukiwanie klientów.</p>
+    </div>
   </div>
   <div id="toast">Skopiowano do schowka ✅</div>
   <script>
     let sortowanieAktywne = false;
-
     function pokazToast() {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 2000);
     }
-
     function czyDrugaLiteraDuza(tekst) {
       const pierwszeSlowo = tekst.trim().split(' ')[0];
       return pierwszeSlowo.length > 1 && pierwszeSlowo[1] === pierwszeSlowo[1].toUpperCase();
     }
-
-    document.querySelectorAll('.tab-link[data-tab]').forEach(link => {
+    // obsługa wszystkich tabów (również CRM w czerwonej tabletce)
+    document.querySelectorAll('.tab-link[data-tab], .crm-pill[data-tab]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        document.querySelectorAll('.tab-link[data-tab]').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-link[data-tab], .crm-pill[data-tab]').forEach(l => l.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         link.classList.add('active');
         document.getElementById(link.dataset.tab).classList.add('active');
-
         if (link.dataset.tab === 'tab2') ladujWylicytowane();
         if (link.dataset.tab === 'tab3') ladujDodaneDzis(sortowanieAktywne);
       });
     });
-
     document.getElementById('filtrujBtn').addEventListener('click', () => {
       sortowanieAktywne = !sortowanieAktywne;
       document.getElementById('filtrujBtn').innerText =
         `🔃 Sortowanie: ${sortowanieAktywne ? 'włączone' : 'wyłączone'}`;
       ladujDodaneDzis(sortowanieAktywne);
     });
-
     async function ladujWylicytowane() {
       const tabela = document.getElementById('wylicytowaneTabela');
       tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>`;
@@ -250,7 +272,6 @@
         tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Błąd ładowania danych</td></tr>`;
       }
     }
-
     async function ladujDodaneDzis(filtruj = false) {
       const tabela = document.getElementById('dodaneTabela');
       tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
@@ -260,10 +281,8 @@
         const dane = Array.isArray(wynik) ? wynik :
                     Array.isArray(wynik.body) ? wynik.body :
                     Array.isArray(wynik.data) ? wynik.data : [];
-
         tabela.innerHTML = '';
         let items = dane.filter(item => item["Produkty Nowe"]);
-
         if (filtruj) {
           items = items.sort((a, b) => {
             const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
@@ -271,15 +290,15 @@
             return aMatch - bMatch;
           });
         }
-
         items.forEach(item => {
           const tekst = item["Produkty Nowe"];
           const row = document.createElement('tr');
           row.innerHTML = `<td class="kopia-wiersza">${tekst}
-            <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`).then(pokazToast)">
-              <i class='fas fa-copy'></i> Kopiuj
-            </button></td>`;
+            <button class="copy-btn"><i class='fas fa-copy'></i> Kopiuj</button></td>`;
           tabela.appendChild(row);
+          row.querySelector('.copy-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(tekst).then(pokazToast);
+          });
         });
       } catch (e) {
         tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych</td></tr>`;
