@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Poleasingowe.pl</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -43,8 +39,7 @@
       cursor: pointer;
     }
 
-    .sidebar a:hover,
-    .sidebar a.active {
+    .sidebar a:hover, .sidebar a.active {
       background-color: #457b9d;
       font-weight: bold;
       color: #ffffff;
@@ -104,50 +99,15 @@
       background-color: #457b9d;
     }
 
-    #uploadForm {
-      margin-top: 20px;
+    table {
+      border-collapse: collapse;
+      background: #fff;
     }
 
-    #uploadForm input[type="file"] {
-      display: block;
-      margin-bottom: 16px;
-    }
-
-    #uploadForm button {
-      display: flex;
-      align-items: center;
-      background-color: #1d3557;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    #uploadForm button svg {
-      margin-right: 8px;
-      fill: white;
-    }
-
-    #loadingSpinner {
-      display: none;
-      margin-left: 10px;
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #1d3557;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
     }
   </style>
 </head>
@@ -159,4 +119,139 @@
     <a class="tab-link" data-tab="tab3">🆕 Dodane dziś</a>
   </div>
 
-  <d
+  <div class="main">
+    <div class="header">Dashboard 📈</div>
+
+    <div id="tab1" class="tab-content active">
+      <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
+      <form id="uploadForm">
+        <input type="file" name="file" accept="application/pdf" required />
+        <button type="submit" class="copy-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
+          </svg>
+          Wyślij PDF
+        </button>
+      </form>
+    </div>
+
+    <div id="tab2" class="tab-content">
+      <table class="tabela-polowa">
+        <thead>
+          <tr>
+            <th>Opis aukcji</th>
+            <th>Kopiuj</th>
+          </tr>
+        </thead>
+        <tbody id="wylicytowaneTabela">
+          <tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="tab3" class="tab-content">
+      <h3>Ogłoszenia ze statusem NOWE:</h3>
+      <table class="tabela-polowa">
+        <thead>
+          <tr>
+            <th>Opis produktu</th>
+            <th>Kopiuj</th>
+          </tr>
+        </thead>
+        <tbody id="dodaneTabela">
+          <tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Przełączanie zakładek
+    document.querySelectorAll('.tab-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        link.classList.add('active');
+        document.getElementById(link.dataset.tab).classList.add('active');
+
+        if (link.dataset.tab === 'tab2') ladujWylicytowane();
+        if (link.dataset.tab === 'tab3') ladujDodaneDzis();
+      });
+    });
+
+    async function ladujWylicytowane() {
+      const tabela = document.getElementById('wylicytowaneTabela');
+      tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>`;
+
+      try {
+        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/3f1a9037-34f4-4f70-a1da-974e230e45c7');
+        const dane = await res.json();
+
+        tabela.innerHTML = '';
+        dane.forEach(item => {
+          const text = [
+            item["Kod produktu"],
+            item["Kod aukcji"],
+            item["Tytuł aukcji"],
+            item["Zwycięzca aukcji"],
+            item["Cena wywoławcza"],
+            item["Aktualna cena"]
+          ].filter(Boolean).join(' | ');
+
+          tabela.innerHTML += `
+            <tr>
+              <td>${text}</td>
+              <td>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${text}\`)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+                  </svg>
+                  Kopiuj
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Błąd ładowania danych</td></tr>`;
+      }
+    }
+
+    async function ladujDodaneDzis() {
+      const tabela = document.getElementById('dodaneTabela');
+      tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Ładowanie danych…</td></tr>`;
+
+      try {
+        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
+        const wynik = await res.json();
+        const dane = Array.isArray(wynik) ? wynik :
+                    Array.isArray(wynik.body) ? wynik.body :
+                    Array.isArray(wynik.data) ? wynik.data :
+                    [];
+
+        tabela.innerHTML = '';
+        dane.forEach(item => {
+          const tekst = item["Produkty Nowe"];
+          if (!tekst) return;
+
+          tabela.innerHTML += `
+            <tr>
+              <td>${tekst}</td>
+              <td>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+                  </svg>
+                  Kopiuj
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        tabela.innerHTML = `<tr><td colspan="2" style="text-align:center;">Błąd ładowania danych</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>
