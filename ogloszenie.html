@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ogłoszenie z PDF (Dane z webhooka n8n)</title>
+  <title>Ogłoszenie PORTAL</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -45,35 +45,40 @@
       resize: none;
       box-sizing: border-box;
     }
-    button.copy-btn {
-      margin-top: 0.75rem;
-      padding: 10px 16px;
-      background: linear-gradient(to right, #202c3b, #4a90e2);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    button.copy-btn:hover {
-      background: linear-gradient(to right, #1a2633, #3d7bc1);
-    }
+    button,
     .nav-button {
-      display: inline-block;
-      margin-top: 2rem;
-      padding: 10px 16px;
-      background: linear-gradient(to right, #1a2633, #3d7bc1);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
+      background-color: #1d3557;
+      color: white;
+      border: none;
+      padding: 12px 18px;
       cursor: pointer;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 600;
+      text-decoration: none;
       transition: background 0.3s ease;
     }
-    .nav-button:hover {
-      background: linear-gradient(to right, #0e1823, #2c5a9c);
+    .nav-button:hover,
+    button:hover {
+      background-color: #16304c;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ccc;
+      border-top: 2px solid #1d3557;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
