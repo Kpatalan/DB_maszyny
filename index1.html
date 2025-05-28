@@ -6,14 +6,12 @@
   <title>Dashboard Poleasingowe.pl</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f8;
       display: flex;
       min-height: 100vh;
     }
-
     .sidebar {
       width: 240px;
       background-color: #1d3557;
@@ -22,14 +20,12 @@
       flex-direction: column;
       padding-top: 20px;
     }
-
     .sidebar h2 {
       text-align: center;
       margin-bottom: 30px;
       font-size: 20px;
       color: #f1faee;
     }
-
     .sidebar a {
       color: #a8dadc;
       text-decoration: none;
@@ -38,26 +34,22 @@
       transition: background 0.3s;
       cursor: pointer;
     }
-
     .sidebar a:hover, .sidebar a.active {
       background-color: #457b9d;
       font-weight: bold;
       color: #ffffff;
     }
-
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-
     .header {
       background-color: #1d3557;
       color: white;
       padding: 16px 24px;
       font-size: 22px;
     }
-
     .tab-content {
       display: none;
       padding: 24px;
@@ -65,16 +57,13 @@
       flex: 1;
       overflow-y: auto;
     }
-
     .tab-content.active {
       display: block;
     }
-
     .tabela-polowa {
       width: 50%;
       margin: 0;
     }
-
     .copy-btn {
       display: flex;
       align-items: center;
@@ -90,34 +79,28 @@
       top: 50%;
       transform: translateY(-50%);
     }
-
     .copy-btn svg {
       margin-right: 4px;
       fill: white;
       width: 16px;
       height: 16px;
     }
-
     .copy-btn:hover {
       background-color: #457b9d;
     }
-
     .kopia-wiersza {
       position: relative;
       padding-right: 80px;
     }
-
     table {
       border-collapse: collapse;
       background: #fff;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
     }
-
     #toast {
       position: fixed;
       bottom: 24px;
@@ -140,7 +123,6 @@
     <a class="tab-link" data-tab="tab2">📈 Wylicytowane dziś</a>
     <a class="tab-link" data-tab="tab3">🆕 Dodane dziś</a>
   </div>
-
   <div class="main">
     <div class="header">Dashboard 📈</div>
 
@@ -151,8 +133,7 @@
         <button type="submit" class="copy-btn">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-          </svg>
-          Wyślij PDF
+          </svg> Wyślij PDF
         </button>
       </form>
     </div>
@@ -193,47 +174,69 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         link.classList.add('active');
         document.getElementById(link.dataset.tab).classList.add('active');
-
+        if (link.dataset.tab === 'tab2') ladujWylicytowane();
         if (link.dataset.tab === 'tab3') ladujDodaneDzis();
       });
     });
 
+    async function ladujWylicytowane() {
+      const tabela = document.getElementById('wylicytowaneTabela');
+      tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
+      try {
+        const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/3f1a9037-34f4-4f70-a1da-974e230e45c7');
+        const dane = await res.json();
+        tabela.innerHTML = '';
+        dane.forEach(item => {
+          const text = [
+            item["Kod produktu"],
+            item["Kod aukcji"],
+            item["Tytuł aukcji"],
+            item["Zwycięzca aukcji"],
+            item["Cena wywoławcza"],
+            item["Aktualna cena"]
+          ].filter(Boolean).join(' | ');
+          const row = document.createElement('tr');
+          row.innerHTML = `<td class="kopia-wiersza">${text}
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${text}\`).then(pokazToast)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+              </svg> Kopiuj
+            </button></td>`;
+          tabela.appendChild(row);
+        });
+      } catch (e) {
+        tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych</td></tr>`;
+      }
+    }
+
     async function ladujDodaneDzis() {
       const tabela = document.getElementById('dodaneTabela');
       tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
-
       try {
         const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
         const wynik = await res.json();
         const dane = Array.isArray(wynik) ? wynik :
                     Array.isArray(wynik.body) ? wynik.body :
-                    Array.isArray(wynik.data) ? wynik.data :
-                    [];
+                    Array.isArray(wynik.data) ? wynik.data : [];
 
         tabela.innerHTML = '';
-
-        dane
-          .filter(item => item["Produkty Nowe"])
-          .sort((a, b) => {
-            const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
-            const bMatch = czyDrugaLiteraDuza(b["Produkty Nowe"]) ? 0 : 1;
-            return aMatch - bMatch;
-          })
-          .forEach(item => {
-            const tekst = item["Produkty Nowe"];
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td class="kopia-wiersza">${tekst}
+        dane.filter(item => item["Produkty Nowe"])
+            .sort((a, b) => {
+              const aMatch = czyDrugaLiteraDuza(a["Produkty Nowe"]) ? 0 : 1;
+              const bMatch = czyDrugaLiteraDuza(b["Produkty Nowe"]) ? 0 : 1;
+              return aMatch - bMatch;
+            })
+            .forEach(item => {
+              const tekst = item["Produkty Nowe"];
+              const row = document.createElement('tr');
+              row.innerHTML = `<td class="kopia-wiersza">${tekst}
                 <button class="copy-btn" onclick="navigator.clipboard.writeText(\`${tekst}\`).then(pokazToast)">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
-                  </svg>
-                  Kopiuj
-                </button>
-              </td>`;
-            tabela.appendChild(row);
-          });
-
+                  </svg> Kopiuj
+                </button></td>`;
+              tabela.appendChild(row);
+            });
       } catch (e) {
         tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych</td></tr>`;
       }
