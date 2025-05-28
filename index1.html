@@ -138,6 +138,22 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+#uploadForm button {
+  margin-top: 8px;
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
   </style>
 </head>
 <body>
@@ -151,26 +167,24 @@
   <div class="main">
     <div class="header">Dashboard 📈</div>
 
-    <div id="tab1" class="tab-content active">
+   <div id="tab1" class="tab-content active">
   <h2>Wyślij plik PDF do generatora ogłoszeń</h2>
-<form
-  id="uploadForm"
-  action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
-  method="post"
-  enctype="multipart/form-data"
-  target="dummyFrame"
->
-  <input type="file" name="file" accept="application/pdf" required />
-  <button type="submit" id="submitBtn">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-      <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
-    </svg>
-    Wyślij PDF
-    <span id="loadingSpinner" class="spinner" style="margin-left: 10px; display: none;"></span>
-  </button>
-</form>
-<iframe name="dummyFrame" style="display:none;"></iframe>
-
+  <form
+    id="uploadForm"
+    action="https://kamilpe.app.n8n.cloud/webhook/2eda0e92-e13b-424b-a4a5-69b805515a0e"
+    method="post"
+    enctype="multipart/form-data"
+    target="dummyFrame"
+  >
+    <input type="file" name="file" accept="application/pdf" required />
+    <button type="submit" id="submitBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+        <path d="M5 20h14v-2H5v2zm7-18L5.33 9h5.34v6h4.66V9h5.34L12 2z" />
+      </svg>
+      Wyślij PDF
+      <span id="loadingSpinner" class="spinner" style="margin-left: 10px; display: none;"></span>
+    </button>
+  </form>
   <iframe name="dummyFrame" style="display:none;"></iframe>
 </div>
 
@@ -262,7 +276,9 @@
         tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Błąd ładowania danych</td></tr>`;
       }
     }
-
+document.getElementById('uploadForm').addEventListener('submit', function () {
+  document.getElementById('loadingSpinner').style.display = 'inline-block';
+});
     async function ladujDodaneDzis(filtruj = false) {
       const tabela = document.getElementById('dodaneTabela');
       tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
