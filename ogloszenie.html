@@ -84,7 +84,7 @@
 }
 </style>
 <script>
-indow.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   document.getElementById("title").value = params.get("title") || "";
   document.getElementById("body").value = params.get("body") || "";
