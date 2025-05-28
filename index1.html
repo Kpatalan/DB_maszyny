@@ -176,16 +176,11 @@
   <table id="dodaneTabela" border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; background: #fff;">
     <thead>
       <tr>
-        <th>Kod produktu</th>
-        <th>Kod aukcji</th>
-        <th>Tytuł aukcji</th>
-        <th>Zwycięzca aukcji</th>
-        <th>Cena wywoławcza</th>
-        <th>Aktualna cena</th>
+        <th>Opis produktu</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>
+      <tr><td style="text-align:center;">Ładowanie danych…</td></tr>
     </tbody>
   </table>
 </div>
@@ -264,9 +259,9 @@ async function ladujWylicytowane() {
   }
 }
 
-    async function ladujDodaneDzis() {
+async function ladujDodaneDzis() {
   const tabela = document.querySelector('#dodaneTabela tbody');
-  tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Ładowanie danych…</td></tr>`;
+  tabela.innerHTML = `<tr><td style="text-align:center;">Ładowanie danych…</td></tr>`;
 
   try {
     const res = await fetch('https://kamilpe.app.n8n.cloud/webhook/374d6c55-e9b2-4169-a65c-9d48b64d9cb2');
@@ -280,33 +275,25 @@ async function ladujWylicytowane() {
                 : [];
 
     if (!Array.isArray(dane) || dane.length === 0) {
-      tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Brak danych.</td></tr>`;
+      tabela.innerHTML = `<tr><td style="text-align:center;">Brak danych.</td></tr>`;
       return;
     }
 
     tabela.innerHTML = '';
     dane.forEach(item => {
+      const tekst = item["Produkty Nowe"];
+      if (!tekst) return;
+
       const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item["Kod produktu"] || '-'}</td>
-        <td>${item["Kod aukcji"] || '-'}</td>
-        <td>${item["Tytuł aukcji"] || '-'}</td>
-        <td>${item["Zwycięca aukcji"] || '-'}</td>
-        <td>${item["Cena wywoławcza"] || '-'}</td>
-        <td>${item["Aktualna cena"] || '-'}</td>
-      `;
+      row.innerHTML = `<td>${tekst}</td>`;
       tabela.appendChild(row);
     });
 
   } catch (err) {
     console.error('Błąd ładowania dodanych:', err);
-    tabela.innerHTML = `<tr><td colspan="6" style="text-align:center;">Błąd ładowania danych.</td></tr>`;
+    tabela.innerHTML = `<tr><td style="text-align:center;">Błąd ładowania danych.</td></tr>`;
   }
 }
-    // Automatyczne ładowanie tab3 jeśli aktywna
-    if (document.querySelector('[data-tab="tab3"]').classList.contains('active')) {
-      ladujDodaneDzis();
-    }
-  </script>
+
 </body>
 </html>
