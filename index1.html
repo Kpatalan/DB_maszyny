@@ -125,19 +125,6 @@
       display: inline-flex;
       align-items: center;
     }
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-top: 2px solid #1d3557;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 10px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
@@ -168,7 +155,7 @@
 
       >
 
-        <input type="file" name="file" accept="application/pdf" required />
+        <input type="file" name="data" accept="application/pdf" required />
 
         <button type="submit">
 
@@ -179,8 +166,6 @@
           </svg>
 
           Wyślij PDF
-
-          <div id="loadingSpinner"><div class="spinner"></div></div>
 
         </button>
 
